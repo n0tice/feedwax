@@ -27,7 +27,7 @@ if($_GET['type'] == "blogs") {
 } else {
 		$google_url = "https://news.google.com/news/feeds?q=" . urlencode($_GET['q']) . "&hl=en&gl=" . $_GET['gl'] . "&um=1&ie=UTF-8&output=rss";
 }
-$geonames_url = "http://ws.geonames.net/rssToGeoRSS?feedUrl=".urlencode($google_url)."&username=mattmcalister";
+$geonames_url = "http://ws.geonames.net/rssToGeoRSS?feedUrl=".urlencode($google_url)."&username=".$geonames_key;
 $n0ticefeed_url = "http://" . $_SERVER['SERVER_NAME'] . "/feeders/googlenewsfeeder.php?url=" . urlencode($google_url) . "&q=" . urlencode($_GET['q']) . "&source=googlenews&type=" . $_GET['type'] . "&LinkInTitle=true";
 $xml = simplexml_load_file($geonames_url); 
 #echo $geonames_url;
