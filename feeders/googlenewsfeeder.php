@@ -51,9 +51,9 @@ foreach ($xml->channel->item as $v) {
 			if ($dc->creator) {echo " - " . $dc->creator;}
 			echo " " . $hashtag . " " . $link . "</title>\n";
 			if ($_GET['source'] == "googlenews" && $_GET['type'] == "news") {
-				echo "     <description><![CDATA[" . $v->description . "]]></description>\n";
+				echo "     <description><![CDATA[" . $v->description . "<br><br>".htmlentities($v->link)."]]></description>\n";
 			} else {
-				echo "     <description><![CDATA[" . htmlspecialchars($v->description) . "<br><br>".$xml->channel->link."]]></description>\n";
+				echo "     <description><![CDATA[" . htmlspecialchars($v->description) . "<br><br>".htmlentities($v->link)."]]></description>\n";
 			}
 			if ($v->copyright) {echo "     <copyright>" . $v->copyright . "</copyright>\n";}
 			echo "     <link>" . $link . "</link>\n";
