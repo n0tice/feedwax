@@ -58,7 +58,6 @@ if ($n < 6) {
 	echo "     <pubDate>" . $v->pubDate . "</pubDate>\n";
 	if (!$geo->lat && !$geo->long) {
 		$extract = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20contentanalysis.analyze%20where%20url%3D%22$link%22&format=json";
-		#$extract = "http://access.alchemyapi.com/calls/url/URLGetRankedNamedEntities?outputMode=json&url=" . $link . "&apikey=60367a355e4a83f6b9a8a51d848509bb29e4a53e&linkedData=0&coreference=0&sourceText=raw";
 		$extract_string .= file_get_contents($extract); // get json content
 		$extract_array = json_decode($extract_string, true); //json decoder
 		#echo htmlentities($extract) . "\n";
