@@ -4,3 +4,7 @@ config/globals.php
 config/globalkeys.php
 
 config.php
+
+feeders/.DS_Store
+
+favicon.gif
