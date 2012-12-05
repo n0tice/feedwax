@@ -52,7 +52,7 @@ echo "<form action=\"http://feedton0tice.com/feeds/new\" method=\"GET\">\n";
 echo "<input type=\"hidden\" name=\"url\" value=\"" . $n0ticefeed_url . "\">";
 ?>
 <div class="alert span7">
-  <strong>Photo re-use guidelines:</strong> Be sure you've obtained explicit permission from copyright owners before publishing their images.  You can use a 'Call Out' or contact people directly.  The Guardian's <a href="http://www.guardian.co.uk/music/interactive/2012/nov/23/live-music-map-gig-photos-twitter">#GdnGig Live Music Map</a> demonstrates how to do a 'Call Out'.
+  <strong>Photo re-use guidelines:</strong> Instagram expects you to issue a 'Call Out' or contact people directly for permission to republish their photograhs.  The Guardian's <a href="http://www.guardian.co.uk/music/interactive/2012/nov/23/live-music-map-gig-photos-twitter">#GdnGig Live Music Map</a> is a useful demonstration of a 'Call Out' to a community of participants.
 </div>
 <?php
 echo "<button class=\"btn btn-large btn-primary span4 align-right\" type=\"submit\">feed this into n0tice</button>";

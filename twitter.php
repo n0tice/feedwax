@@ -98,7 +98,7 @@ echo "<form action=\"http://feedton0tice.com/feeds/new\" method=\"GET\">\n";
 echo "<input type=\"hidden\" name=\"url\" value=\"" . $n0ticefeed_url . "\">";
 ?>
 <div class="alert span7">
-  <strong>Photo re-use guidelines:</strong> You may wish to use a 'Call Out' or contact people directly for permission to republish their photograhs.  The Guardian's <a href="http://www.guardian.co.uk/music/interactive/2012/nov/23/live-music-map-gig-photos-twitter">#GdnGig Live Music Map</a> is a useful demonstration of a 'Call Out' to a community of participants.
+  <strong>Photo re-use guidelines:</strong> You may wish to issue a 'Call Out' or contact people directly for permission to republish their photograhs.  The Guardian's <a href="http://www.guardian.co.uk/music/interactive/2012/nov/23/live-music-map-gig-photos-twitter">#GdnGig Live Music Map</a> is a useful demonstration of a 'Call Out' to a community of participants.
 </div>
 <?php
 echo "<button class=\"btn btn-large btn-primary span4 align-right\" type=\"submit\">feed this into n0tice</button>";
