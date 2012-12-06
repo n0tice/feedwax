@@ -9,6 +9,11 @@ if ($_GET['lat']) {
 		} else { 
 	$lat = "";
 }
+if (empty($_GET['q'])) {
+	$q = "pic.twitter.com";
+		} else { 
+	$q = $_GET['q']; 
+}
 if ($_GET['long']) {
 	$long = $_GET['long']; 
 		} else { 
@@ -59,7 +64,7 @@ include('nav.php');
 <h1>Build a feed with Twitter</h1>
 <table class="table">
 <tr><td><form action="" method="GET" class="well">
-    Search terms: <input type="text" class="text" value="<?php if($_GET['q']) { echo $_GET['q']; } else { echo "n0tice"; } ?>" name="q" /><br>
+    Search terms: <input type="text" class="text" value="<?php if($_GET['q']) { echo $q; } else { echo ""; } ?>" name="q" placeholder="#hashtag pic.twitter.com -RT" /><br>
     Media: <input type="radio" class="radio" value="all" name="media" <?php if($media != "images") {echo "checked";} ?>/> All posts <input type="radio" class="text" value="images" name="media" <?php if($media == "images") {echo "checked";} ?>/> Posts wth images<br>
 	Number of tweets: <input type="text" class="input-mini" size="10" value="<?php if($_GET['rpp']) { echo $_GET['rpp']; } else { echo "20"; } ?>" name="rpp" /> (max 100)<br>
     Lat: <input type="text" class="input-mini" value="<?php echo $lat; ?>" name="lat" /> (eg 51.534631)<br>
@@ -89,7 +94,7 @@ include('nav.php');
 <?php 
 if ($_GET) {
 
-$twitterapi_url="https://search.twitter.com/search.json?q=" . urlencode($_GET['q']) . $geocode . "&include_entities=true&result_type=mixed&rpp=$rpp";
+$twitterapi_url="https://search.twitter.com/search.json?q=" . urlencode($q) . $geocode . "&include_entities=true&result_type=mixed&rpp=$rpp";
 $n0ticefeed_url="http://" . $_SERVER['SERVER_NAME'] . "/feeders/twitterfeed.php?q=" . urlencode($_GET['q']) . $geocode . $altgeocode . "&rpp=$rpp&media=$media&defaultloc=$defaultloc";
 $string .= file_get_contents($twitterapi_url); // get json content
 $array = json_decode($string, true); //json decoder
