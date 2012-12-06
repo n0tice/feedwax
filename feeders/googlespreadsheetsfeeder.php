@@ -6,7 +6,7 @@ echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
 $spreadsheet_key = $_GET['spreadsheet_key'];
  
 // Set your CSV feed
-$feed = 'https://docs.google.com/a/guardian.co.uk/spreadsheet/pub?key='.$spreadsheet_key.'&single=true&gid=0&output=csv';
+$feed = 'https://docs.google.com/spreadsheet/pub?key='.$spreadsheet_key.'&oe=utf-8&single=true&output=csv';
  
 // Arrays we'll use later
 $keys = array();
@@ -62,14 +62,14 @@ for ($j = 0; $j < $count; $j++) {
       xmlns:dc="http://purl.org/dc/elements/1.1/"
       xmlns:media="http://search.yahoo.com/mrss/">
 <channel>
-    <title>localshopping spreadsheet</title>
-    <link>http://localshopping.n0tice.com/</link>
-    <description>localshopping description</description>
+    <title>Google spreadsheet RSS feed</title>
+    <link>http://feedwax.com/</link>
+    <description>Google spreadsheet RSS feed powered by FeedWax</description>
 <?php
 $i = 0; 
 foreach ($newArray as $v) {
 
-	if ((empty($v['lat'])) && (!empty($v['postcode']))) {
+	if ((empty($v['lat'])) && (!empty($v['postcode'])) && (!empty($v['url']))) {
 	$fulladdress = $v['address'].",".$v['city'].",".$v['postcode'];
 	$place_url="https://maps.googleapis.com/maps/api/place/textsearch/json?query=".urlencode($fulladdress)."&sensor=true&key=".$google_key;
 		$place_string .= file_get_contents($place_url); // get json content
