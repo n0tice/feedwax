@@ -27,6 +27,7 @@
                     <ul class="nav nav-list">
                         <li class="nav-header">RSS Feeds</li>
                         <li><a href="rss-precise.php">Geocoder</a></li>
+                        <li><a href="spreadsheets.php">Spreadsheets</a></li>
                         <li class="nav-header">Social Data</li>
                         <li><a href="twitter.php">Twitter</a></li>
                         <li class="nav-header">Images</li>
