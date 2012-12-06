@@ -67,13 +67,13 @@ include('nav.php');
     Search terms: <input type="text" class="text" value="<?php if($_GET['q']) { echo $q; } else { echo ""; } ?>" name="q" placeholder="#hashtag pic.twitter.com -RT" /><br>
     Media: <input type="radio" class="radio" value="all" name="media" <?php if($media != "images") {echo "checked";} ?>/> All posts <input type="radio" class="text" value="images" name="media" <?php if($media == "images") {echo "checked";} ?>/> Posts wth images<br>
 	Number of tweets: <input type="text" class="input-mini" size="10" value="<?php if($_GET['rpp']) { echo $_GET['rpp']; } else { echo "20"; } ?>" name="rpp" /> (max 100)<br>
-    Lat: <input type="text" class="input-mini" value="<?php echo $lat; ?>" name="lat" /> (eg 51.534631)<br>
-    Long: <input type="text" class="input-mini" value="<?php echo $long; ?>" name="long" />( eg -0.121965)<br>
+    Lat: <input type="text" class="input-small" value="<?php echo $lat; ?>" name="lat" /> (eg 51.534631)<br>
+    Long: <input type="text" class="input-small" value="<?php echo $long; ?>" name="long" />( eg -0.121965)<br>
     Radius: <input type="text" class="input-mini" value="<?php echo $radius; ?>" name="radius" />(in miles)<br>
 <hr>
-	Unlocated tweets: <input type="radio" class="radio" value="exclude" name="defaultloc" <?php if($defaultloc != "assign") {echo "checked";} ?>/> Exclude <input type="radio" class="text" value="assign" name="defaultloc" <?php if($defaultloc == "assign") {echo "checked";} ?>/> Assign<br>
-    Assigned Lat: <input type="text" class="input-mini" value="<?php echo $assignedlat; ?>" name="assignedlat" /><br>
-    Assigned Long: <input type="text" class="input-mini" value="<?php echo $assignedlong; ?>" name="assignedlong" /><br>
+	Unlocated tweets:<br><input type="radio" class="radio" value="exclude" name="defaultloc" <?php if($defaultloc != "assign") {echo "checked";} ?>/> Exclude <input type="radio" class="text" value="assign" name="defaultloc" <?php if($defaultloc == "assign") {echo "checked";} ?>/> Assign<br>
+    Assigned Lat: <input type="text" class="input-small" value="<?php echo $assignedlat; ?>" name="assignedlat" /><br>
+    Assigned Long: <input type="text" class="input-small" value="<?php echo $assignedlong; ?>" name="assignedlong" /><br>
 <button type="submit" value="build feed" class="btn"><i class="icon-fire"></i> build feed</button>
 </form></td>
 <td>
