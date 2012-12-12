@@ -8,3 +8,11 @@ config.php
 feeders/.DS_Store
 
 favicon.gif
+
+custom/bigbarn.php
+
+custom/bigbarn.rss
+
+custom/bookshops.rss
+
+instagramtag-new.php
