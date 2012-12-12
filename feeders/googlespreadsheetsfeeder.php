@@ -4,6 +4,8 @@ header('Content-type: application/rss+xml; charset=utf-8');
 echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
 
 $spreadsheet_key = $_GET['spreadsheet_key'];
+if ($_GET['hashtag']) {$hashtag = " #".$_GET['hashtag'];}
+if ($_GET['titleformat'] = "joined") {$titleformat = "joined";}
  
 // Set your CSV feed
 $feed = 'https://docs.google.com/spreadsheet/pub?key='.$spreadsheet_key.'&oe=utf-8&single=true&output=csv';
@@ -26,7 +28,7 @@ function csvToArray($file, $delimiter) {
   } 
   return $arr; 
 } 
- 
+
 // Do it
 $data = csvToArray($feed, ',');
  
@@ -78,7 +80,7 @@ foreach ($newArray as $v) {
 		$long = $place_array['results'][0]['geometry']['location']['lng'];
 		$geolat = "     <geo:lat>".$lat."</geo:lat>\n";
 		$geolong = "     <geo:long>".$long."</geo:long>\n";
-	} else {
+	} elseif(!empty($v['lat'])) {
 		$geolat = "     <geo:lat>".$v['lat']."</geo:lat>\n";
 		$geolong = "     <geo:long>".$v['long']."</geo:long>\n";
 	}
@@ -86,19 +88,45 @@ foreach ($newArray as $v) {
 	if (!empty($v['image'])) {
 		$mediacontent = "     <media:content url=\"" . $v['image'] . "\" type=\"image/jpeg\"></media:content>\n";
 	}
+	if (!empty($v['tag'])) {
+		$tag = " #".$v['tag'];
+	}
+	if (!empty($v['description'])) {
+		$description = "     <description><![CDATA[".$v['description']."]]></description>\n";
+	} else {
+		$description = "     <description> </description>\n";
+	}
+	
+	if (!empty($v['url'])) {
+		$originalurl  = $v['url'];
+		$urlpieces = explode("http://", $originalurl);
+		if ($urlpieces[0] != "") {$rsslink = "http://".$urlpieces[0];} else {$rsslink = "http://".$urlpieces[1];}
+	} else {
+		$rsslink = "https://maps.google.com/maps?q=".urlencode($v['title'])."&amp;hl=en";
+	}
+	
+	if ($titleformat = "joined") {
+			$title = "     <title><![CDATA[".str_replace('&', '&amp;', $v['title'])." - ".htmlspecialchars($v['description']).$tag.$hashtag."]]></title>\n";
+			$description = "     <description> </description>\n";
+		} else {
+			$title = "     <title>".str_replace('&', '&amp;', $v['title']).$tag.$hashtag."</title>\n";
+		}
 
 	$pubdate = date("D, d M Y H:i:s O");
 
+	if ($geolat != "     <geo:lat></geo:lat>") {
 	echo "<item>\n";
-		echo "     <title>".$v['title']."</title>\n";
-		echo "     <description>".$v['description']."</description>\n";
+		echo $title;
+		echo $description;
 		echo $geolat;
 		echo $geolong;
 		echo $mediacontent;
 		echo "     <pubDate>".$pubdate."</pubDate>\n";
-		echo "     <link>".$v['url']."</link>\n";
-		echo "     <guid>".$v['url']."</guid>\n";
+		echo "     <link>".$rsslink."</link>\n";
+		echo "     <guid>".$rsslink."</guid>\n";
 	echo "</item>\n";
+	}
+	
 unset($fulladdress);
 unset($geolat);
 unset($geolong);

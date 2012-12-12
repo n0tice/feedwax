@@ -21,7 +21,7 @@ $spreadsheet_key = $_GET['spreadsheet_key'];
 if ($_GET) {
 
 $n0ticefeed_url="http://feedwax.com/feeders/googlespreadsheetsfeeder.php?spreadsheet_key=".$spreadsheet_key."#gid=0";
-$content = utf8_encode(file_get_contents($n0ticefeed_url));
+$content = file_get_contents($n0ticefeed_url);
 $xml = @simplexml_load_string($content);
 
 echo $n0ticefeed_url;
@@ -45,7 +45,7 @@ $i = 0;
 	echo "<tr><td><strong>";
 	echo htmlentities($v->title);
 	echo "</strong><br>";
-	if(!empty($v->description)){echo $v->description;}
+	#if(!empty($v->description)){echo $v->description;}
 	echo "</td></tr>\n";
 	$i++;
 	}
