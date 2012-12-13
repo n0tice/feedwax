@@ -33,10 +33,10 @@ $cleantag2 = $matches[1];
 	<li><a href="instagramgeo.php">Search by Location</a></li>
 </ul>
 	<form action="" method="GET" class="well">
-		Tags: <input type="text" class="span3" value="<?php if($_GET['q']) { echo $cleantag1." ".$cleantag2; } else { echo ""; } ?>" name="q" placeholder="hashtag"/><br>
+		Tags to search: <input type="text" class="input-medium" value="<?php if($_GET['q']) { echo $cleantag1." ".$cleantag2; } ?>" name="q" placeholder="tag1 tag2"/> (up to 2 tags)<br>
+		Tag to exclude: <input type="text" class="input-mini" value="<?php if(!empty($not)) { echo $not; } ?>" name="not" placeholder="optional"/><br>
 		Assign default location to unlocated Instagrams:<br><input type="text" class="input-xlarge" value="<?php if($_GET['defaultloc']) { echo $_GET['defaultloc']; } else { echo ""; } ?>" name="defaultloc"  placeholder="optional" /> (lat,long)<br>
 		<input type="hidden" value="<?php if($_GET['count']) { echo $_GET['count']; } else { echo "10"; } ?>" name="count" />
-		<input type="hidden" value="<?php if($_GET['not']) { echo $_GET['not']; } else { echo ""; } ?>" name="not" />
 	<button type="submit" value="build feed" class="btn"><i class="icon-fire"></i> build feed</button>
 	</form>
 </div>
@@ -44,21 +44,45 @@ $cleantag2 = $matches[1];
 
 <?php 
 if ($_GET) {
+
 $instagram_cleantag1="https://api.instagram.com/v1/tags/".urlencode($cleantag1)."/media/recent?client_id=$client_id&count=$count";
 $string_cleantag1 .= file_get_contents($instagram_cleantag1); // get json content
 $array_cleantag1 = json_decode($string_cleantag1, true); //json decoder
+
+$array_refined = array();
 
 if (!empty($cleantag2)) {
 	$instagram_cleantag2="https://api.instagram.com/v1/tags/" . urlencode($cleantag2) . "/media/recent?client_id=$client_id&count=$count";
 	$string_cleantag2 .= file_get_contents($instagram_cleantag2); // get json content
 	$array_cleantag2 = json_decode($string_cleantag2, true); //json decoder
-	
-	$array_hashtags = array_merge($array_cleantag1, $array_cleantag2);
-	$onetag = "false";
+
+	$b = 0;
+	foreach ($array_cleantag1['data'] as $item) {
+		if (in_array($cleantag2,$item['tags'])) {
+			array_push($array_refined, $item);
+		}
+	$b++;
+	}
+
+	$c = 0;
+	foreach ($array_cleantag2['data'] as $item) {
+		if (in_array($cleantag1,$item['tags'])) {
+			array_push($array_refined, $item);
+		}
+	$c++;
+	}
+
 } else {
-	$array_hashtags = $array_cleantag1;
-	$onetag = "true";
+	$a = 0;
+	foreach ($array_cleantag1['data'] as $item) {
+		array_push($array_refined, $item);
+	$a++;
+	}
 }
+
+#echo "tag1: ".$cleantag1."<br>";
+#echo "tag2: ".$cleantag2."<br>";
+#echo json_encode($array_refined);
 
 $n0ticefeed_url = "http://" . $_SERVER['SERVER_NAME'] . "/feeders/instagramfeed.php?" . $_SERVER['QUERY_STRING'];
 
@@ -83,38 +107,24 @@ echo "  </thead>";
 echo "  <tbody class=\"well\">";
 
 $i = 0; 
-foreach ($array_hashtags['data'] as $v) {
-$array_tags = $v['tags'];
-	if ($onetag == "true") {
-		if (empty($v['location']['latitude'])) {
-			echo "<tr><td>";
-			$locationmsg = "Location not found<br>";				
-		} else {
-			echo "<tr class=\"success\"><td>";
-			$locationmsg = "Location: " . $v['location']['latitude'] . "," . $v['location']['longitude'] . "<br>";
-		}
-		echo htmlspecialchars($v['caption']['text']) ."<br><br>Tags: ";
-		foreach ($array_tags as $t) {echo "#".$t." ";}
-		echo "<br><a href=\"" . $v['link'] . "\">" . $v['link'] . "</a><br>\n";
-		echo $locationmsg;
-		echo date("D, d M y H:i:s O", $v['caption']['created_time']);
-		echo "</td><td><img src=\"" . $v['images']['standard_resolution']['url'] . "\"></td></tr>\n";
-	} elseif ($onetag == "false" && in_array($cleantag1, $array_tags) && in_array($cleantag2, $array_tags)){		
-		if (empty($v['location']['latitude'])) {
-			echo "<tr><td>";
-			$locationmsg = "Location not found<br>";				
-		} else {
-			echo "<tr class=\"success\"><td>";
-			$locationmsg = "Location: " . $v['location']['latitude'] . "," . $v['location']['longitude'] . "<br>";
-		}
-		echo htmlspecialchars($v['caption']['text']) ."<br><br>Tags: ";
-		foreach ($array_tags as $t) {echo "#".$t." ";}
-		echo "<br><a href=\"" . $v['link'] . "\">" . $v['link'] . "</a><br>\n";
-		echo $locationmsg;
-		echo date("D, d M y H:i:s O", $v['caption']['created_time']);
-		echo "</td><td><img src=\"" . $v['images']['standard_resolution']['url'] . "\"></td></tr>\n";
+foreach ($array_refined as $v) {
+if (!in_array($not,$v['tags'])) {
+	$array_tags = $v['tags'];
+	if (empty($v['location']['latitude'])) {
+		echo "<tr><td>";
+		$locationmsg = "Location not found<br>";				
+	} else {
+		echo "<tr class=\"success\"><td>";
+		$locationmsg = "Location: " . $v['location']['latitude'] . "," . $v['location']['longitude'] . "<br>";
 	}
-unset($array_tags);
+	echo htmlspecialchars($v['caption']['text']) ."<br><br>Tags: ";
+	foreach ($array_tags as $t) {echo "#".$t." ";}
+	echo "<br><a href=\"" . $v['link'] . "\">" . $v['link'] . "</a><br>\n";
+	echo $locationmsg;
+	echo date("D, d M y H:i:s O", $v['caption']['created_time']);
+	echo "</td><td><img src=\"" . $v['images']['standard_resolution']['url'] . "\"></td></tr>\n";
+	unset($array_tags);
+}
 $i++;
 }
 echo "  </tbody>";
