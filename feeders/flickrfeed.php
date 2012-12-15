@@ -1,6 +1,6 @@
 <?php
 include('../config/globals.php');
-header('Content-type: application/rss+xml');
+header('Content-type: application/rss+xml; charset=utf-8');
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Cache-Control: no-cache");
 header("Pragma: no-cache");
@@ -30,15 +30,28 @@ if ($_GET['maxresults']) {
 		} else { 
 	$maxresults = "10";
 }
+if ($_GET['unlocatedphotos']) {
+	$unlocatedphotos = $_GET['unlocatedphotos']; 
+		} else { 
+	$unlocatedphotos = "exclude";
+}
+$assignedloc = $_GET['assignedloc'];
+if ($_GET['unlocatedphotos'] == "exclude") {
+	$assignedloc = null;
+}
+function explodeCommas($commalist) {
+	return explode(',', $commalist);
+}
+list($assignedlat,$assignedlong) = explodeCommas($assignedloc);
+
 echo "<?xml version=\"1.0\"?>\n";
 $secret = $flickr_secret;
 $api_key = $flickr_key;
-$params = "accuracy11api_key" . $api_key . "extrasdescriptiongeoformatjsonhas_geo1lat" . $lat . "lon" . $long . "methodflickr.photos.searchnojsoncallback1per_page" . $maxresults . "radius" . $radius . "tags" . $q . "text" . $q;
+$params = "accuracy11api_key" . $api_key . "extrasdate_takendescriptiongeoowner_nametagsformatjsonlicense4567methodflickr.photos.searchnojsoncallback1per_page" . $maxresults . "sortdate-posted-desctags" . $q . "text" . $q;
 $sigmaker = $secret.$params;
 $api_sig = md5($sigmaker);
-
-$api_url="http://api.flickr.com/services/rest/?method=flickr.photos.search&accuracy=11&api_key=$api_key&format=json&has_geo=1&lat=$lat&license=4,5,6,7&lon=$long&nojsoncallback=1&per_page=$maxresults&radius=$radius&tags=$q&text=$q&extras=description,date_taken,owner_name,geo,path_alias,url_z&sort=date-posted-desc";
-$string .= file_get_contents($api_url); // get json content
+$flickr_url = "http://api.flickr.com/services/rest/?method=flickr.photos.search&accuracy=11&api_key=$api_key&extras=date_taken,date_upload,description,geo,last_update,owner_name,url_z&format=json&license=4,5,6,7&nojsoncallback=1&per_page=$maxresults&sort=date-posted-desc&tags=$q&text=$q";
+$string .= file_get_contents($flickr_url); // get json content
 $array = json_decode($string, true); //json decoder
 ?>
 
@@ -47,26 +60,44 @@ $array = json_decode($string, true); //json decoder
       xmlns:dc="http://purl.org/dc/elements/1.1/"
       xmlns:media="http://search.yahoo.com/mrss/">
 <channel>
-    <title>Flickr search: <?php echo $q; ?></title>
-    <link><?php echo htmlentities($api_url); ?></link>
+    <title>Flickr search: <?php echo urldecode($q); ?></title>
+    <link><?php #echo $api_url; ?>http://www.flickr.com/search/?q=<?php echo $q; ?></link>
     <description><?php echo $maxresults; ?> Flickr images of <?php echo $q; ?></description>
 
 <?php
 $i = 0; 
 if ($array['photos']['total'] != 0) {
 	foreach ($array['photos']['photo'] as $v) {
-		echo "<item>\n";
-		echo "<title>" . $v['title'] . " - Photo by " . $v['ownername'] . "</title>\n";
-		echo "<description>" . $v['description']['_content'] . "</description>";
-		echo "<media:content url=\"" . $v['url_z'] . "\" type=\"image/jpeg\"></media:content>\n";
-		$pubdate = strtotime($v['datetaken']);
-		echo "<pubDate>" . date("D, d M y H:i:s O", $pubdate) . "</pubDate>";
-		echo "<link>http://www.flickr.com/photos/" . $v['pathalias'] . "/" . $v['id'] . "/</link>";
-		echo "<guid>http://www.flickr.com/photos/" . $v['pathalias'] . "/" . $v['id'] . "/</guid>";
-		echo "<geo:lat>". $v['latitude'] . "</geo:lat>\n";
-		echo "<geo:long>". $v['longitude'] . "</geo:long>\n";
-		echo "</item>\n";
-		$i++;
+	if (preg_match("/_MG_|IMG_|DSC_/", $v['title'])) {
+		$titlerewrite = true;
+	} else {
+		$titlerewrite = false;
+	}
+	if ((!empty($v['latitude']) || !empty($assignedlat)) ){
+		$imageurl = "http://www.flickr.com/photos/" . $v['owner'] . "/" . $v['id'] . "/";
+			echo "<item>\n";
+			echo "<title>";
+			if ($titlerewrite == false) {echo $v['title'] . " - Photo by " . $v['ownername'];} else {echo "Photo by ".$v['ownername'];}
+			echo "</title>\n";
+			echo "<description><![CDATA[";
+			echo $v['description']['_content'];
+			echo "\n\nBy " . $v['ownername'] . " via Flickr: http://www.flickr.com/people/".$v['owner']."\n";
+			echo "]]></description>\n";
+			echo "<media:content url=\"" . $v['url_z'] . "\" type=\"image/jpeg\"></media:content>\n";
+			$pubdate = strtotime($v['datetaken']);
+			echo "<pubDate>" . date("D, d M y H:i:s O", $pubdate) . "</pubDate>\n";
+			echo "<link>".$imageurl."</link>\n";
+			echo "<guid>".$imageurl."</guid>\n";
+			if (empty($v['latitude'])) {
+				echo "<geo:lat>". $assignedlat . "</geo:lat>\n";
+				echo "<geo:long>". $assignedlong . "</geo:long>\n";			
+			} else {
+				echo "<geo:lat>". $v['latitude'] . "</geo:lat>\n";
+				echo "<geo:long>". $v['longitude'] . "</geo:long>\n";
+			}
+			echo "</item>\n";
+			$i++;
+		}
 	}
 }
 ?>
