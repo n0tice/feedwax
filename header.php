@@ -78,7 +78,7 @@ header('Content-type: text/html; charset=utf-8');
             }
 
             function getCenterLatLngText() {
-                return '(' + map.getCenter().lat() +', '+ map.getCenter().lng() +')';
+                return '(' + map.getCenter().lat() +','+ map.getCenter().lng() +')';
             }
 
             function centerChanged() {
