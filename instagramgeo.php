@@ -17,11 +17,11 @@ $count = $_GET['count'];
 
 <div class="hero-unit">
 <h1>Build a feed with Instagram</h1>
-<div class="well">
 <ul class="nav nav-tabs">
 	<li><a href="instagramtag.php">Search by Tags</a></li>
 	<li class="active"><a href="instagramgeo.php">Search by Location</a></li>
 </ul>
+<div class="well">
 <table class="table">
 <tr><td><form action="" method="GET" class="well">
     Lat: <input type="text" class="text" value="<?php echo $lat; ?>" name="lat" /><br>
@@ -30,7 +30,7 @@ $count = $_GET['count'];
 <button type="submit" value="build feed" class="btn"><i class="icon-fire"></i> build feed</button>
 </form></td>
 <td>
-  Find Place: <input type="text" id="address"/><input type="button" value="Go" onclick="geocode()">
+  Find Place: <input type="text" class="input-medium" id="address"/><input type="button" value="Go" onclick="geocode()">
   <div id="map">
     <div id="map_canvas" style="width:100%; height:200px"></div>
     <div id="crosshair"></div>

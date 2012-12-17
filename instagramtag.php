@@ -27,11 +27,11 @@ $cleantag2 = $matches[1];
 
 <div class="hero-unit">
 <h1>Build a feed with Instagram</h1>
-<div class="well">
 <ul class="nav nav-tabs">
 	<li class="active"><a href="instagramtag.php">Search by Tags</a></li>
 	<li><a href="instagramgeo.php">Search by Location</a></li>
 </ul>
+<div class="well">
 	<form action="" method="GET" class="well">
 		Tags to search: <input type="text" class="input-medium" value="<?php if($_GET['q']) { echo $cleantag1." ".$cleantag2; } ?>" name="q" placeholder="tag1 tag2"/> (up to 2 tags)<br>
 		Tag to exclude: <input type="text" class="input-mini" value="<?php if(!empty($not)) { echo $not; } ?>" name="not" placeholder="optional"/><br>
