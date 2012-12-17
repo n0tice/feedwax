@@ -30,6 +30,13 @@ if ($_GET['maxresults']) {
 		} else { 
 	$maxresults = "10";
 }
+if ($_GET['license'] == "all") {
+	$license = "0,1,2,3,4,5,6,7"; 
+	$licensenocomma = "01234567"; 
+		} else { 
+	$license = "4,5,6,7"; 
+	$licensenocomma = "4567"; 
+}
 if ($_GET['unlocatedphotos']) {
 	$unlocatedphotos = $_GET['unlocatedphotos']; 
 		} else { 
@@ -45,12 +52,13 @@ function explodeCommas($commalist) {
 list($assignedlat,$assignedlong) = explodeCommas($assignedloc);
 
 echo "<?xml version=\"1.0\"?>\n";
+$extras = "date_taken,date_upload,description,geo,last_update,license,owner_name,url_z";
 $secret = $flickr_secret;
 $api_key = $flickr_key;
-$params = "accuracy11api_key" . $api_key . "extrasdate_takendescriptiongeoowner_nametagsformatjsonlicense4567methodflickr.photos.searchnojsoncallback1per_page" . $maxresults . "sortdate-posted-desctags" . $q . "text" . $q;
+$params = "accuracy11api_key" . $api_key . "extrasdate_takendescriptiongeoowner_nametagsformatjsonhas_geo1lat" . $lat . "license" . $licensenocomma . "lon" . $long . "methodflickr.photos.searchnojsoncallback1per_page" . $maxresults . "radius" . $radius . "sortdate-posted-desctags" . $q . "text" . $q;
 $sigmaker = $secret.$params;
 $api_sig = md5($sigmaker);
-$flickr_url = "http://api.flickr.com/services/rest/?method=flickr.photos.search&accuracy=11&api_key=$api_key&extras=date_taken,date_upload,description,geo,last_update,owner_name,url_z&format=json&license=4,5,6,7&nojsoncallback=1&per_page=$maxresults&sort=date-posted-desc&tags=$q&text=$q";
+$flickr_url = "http://api.flickr.com/services/rest/?method=flickr.photos.search&accuracy=11&api_key=$api_key&extras=".urlencode($extras)."&format=json&has_geo=1&lat=$lat&license=".urlencode($license)."&lon=$long&nojsoncallback=1&per_page=$maxresults&radius=$radius&sort=date-posted-desc&tags=$q&text=$q";
 $string .= file_get_contents($flickr_url); // get json content
 $array = json_decode($string, true); //json decoder
 ?>
@@ -73,6 +81,15 @@ if ($array['photos']['total'] != 0) {
 	} else {
 		$titlerewrite = false;
 	}
+	if ($v['license'] == "0") {$getlicense = "All Rights Reserved";}
+	if ($v['license'] == "1") {$getlicense = "Attribution-NonCommercial-ShareAlike License";}
+	if ($v['license'] == "2") {$getlicense = "Attribution-NonCommercial License";}
+	if ($v['license'] == "3") {$getlicense = "Attribution-NonCommercial-NoDerivs License";}
+	if ($v['license'] == "4") {$getlicense = "Attribution License";}
+	if ($v['license'] == "5") {$getlicense = "Attribution-ShareAlike License";}
+	if ($v['license'] == "6") {$getlicense = "Attribution-NoDerivs License";}
+	if ($v['license'] == "7") {$getlicense = "No known copyright restrictions";}
+
 	if ((!empty($v['latitude']) || !empty($assignedlat)) ){
 		$imageurl = "http://www.flickr.com/photos/" . $v['owner'] . "/" . $v['id'] . "/";
 			echo "<item>\n";
@@ -82,6 +99,7 @@ if ($array['photos']['total'] != 0) {
 			echo "<description><![CDATA[";
 			echo $v['description']['_content'];
 			echo "\n\nBy " . $v['ownername'] . " via Flickr: http://www.flickr.com/people/".$v['owner']."\n";
+			echo "\nLicense: ".$getlicense."\n";
 			echo "]]></description>\n";
 			echo "<media:content url=\"" . $v['url_z'] . "\" type=\"image/jpeg\"></media:content>\n";
 			$pubdate = strtotime($v['datetaken']);
