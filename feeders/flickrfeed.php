@@ -12,13 +12,21 @@ if ($_GET['q']) {
 }
 if ($_GET['lat']) {
 	$lat = $_GET['lat']; 
+	$latparams1 = "lat".$lat;
+	$latparams2 = "&lat=".$lat;
 		} else { 
-	$lat = "51.534631";
+	$lat = "";
+	$latparams1 = "";
+	$latparams2 = "";
 }
 if ($_GET['long']) {
 	$long = $_GET['long']; 
+	$longparams1 = "lon".$long;
+	$longparams2 = "&lon=".$long;
 		} else { 
-	$long = "-0.121965";
+	$long = "";
+	$longparams1 = "";
+	$longparams2 = "";
 }
 if ($_GET['radius']) {
 	$radius = $_GET['radius']; 
@@ -55,10 +63,10 @@ echo "<?xml version=\"1.0\"?>\n";
 $extras = "date_taken,date_upload,description,geo,last_update,license,owner_name,url_z";
 $secret = $flickr_secret;
 $api_key = $flickr_key;
-$params = "accuracy11api_key" . $api_key . "extrasdate_takendescriptiongeoowner_nametagsformatjsonhas_geo1lat" . $lat . "license" . $licensenocomma . "lon" . $long . "methodflickr.photos.searchnojsoncallback1per_page" . $maxresults . "radius" . $radius . "sortdate-posted-desctags" . $q . "text" . $q;
+$params = "accuracy11api_key" . $api_key . "extrasdate_takendescriptiongeoowner_nametagsformatjsonhas_geo1" . $latparams1 . "license" . $licensenocomma . $longparams1 . "methodflickr.photos.searchnojsoncallback1per_page" . $maxresults . "radius" . $radius . "sortdate-posted-desctags" . $q . "text" . $q;
 $sigmaker = $secret.$params;
 $api_sig = md5($sigmaker);
-$flickr_url = "http://api.flickr.com/services/rest/?method=flickr.photos.search&accuracy=11&api_key=$api_key&extras=".urlencode($extras)."&format=json&has_geo=1&lat=$lat&license=".urlencode($license)."&lon=$long&nojsoncallback=1&per_page=$maxresults&radius=$radius&sort=date-posted-desc&tags=$q&text=$q";
+$flickr_url = "http://api.flickr.com/services/rest/?method=flickr.photos.search&accuracy=11&api_key=$api_key&extras=".urlencode($extras)."&format=json&has_geo=1".$latparams2."&license=".urlencode($license).$longparams2."&nojsoncallback=1&per_page=$maxresults&radius=$radius&sort=date-posted-desc&tags=$q&text=$q";
 $string .= file_get_contents($flickr_url); // get json content
 $array = json_decode($string, true); //json decoder
 ?>
