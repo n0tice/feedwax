@@ -65,7 +65,7 @@ include('nav.php');
 <table class="table">
 <tr><td><form action="" method="GET" class="well">
     Search terms: <input type="text" class="text" value="<?php if($_GET['q']) { echo $q; } else { echo ""; } ?>" name="q" placeholder="#hashtag pic.twitter.com -RT" /><br>
-    Media: <input type="radio" class="radio" value="all" name="media" <?php if($media != "images") {echo "checked";} ?>/> All posts <input type="radio" class="text" value="images" name="media" <?php if($media == "images") {echo "checked";} ?>/> Posts wth images<br>
+    Media: <input type="radio" class="radio" value="all" name="media" <?php if($media != "images") {echo "checked";} ?>/> All posts <input type="radio" class="text" value="images" name="media" <?php if($media == "images") {echo "checked";} ?>/> Posts with images<br>
 	Number of tweets: <input type="text" class="input-mini" size="10" value="<?php if($_GET['rpp']) { echo $_GET['rpp']; } else { echo "20"; } ?>" name="rpp" /> (max 100)<br>
     Lat: <input type="text" class="input-small" value="<?php echo $lat; ?>" name="lat" /> (eg 51.534631)<br>
     Long: <input type="text" class="input-small" value="<?php echo $long; ?>" name="long" />( eg -0.121965)<br>
