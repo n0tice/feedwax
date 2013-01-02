@@ -5,6 +5,14 @@ header('Content-type: text/html; charset=utf-8');
 "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
 <head>
+<?php
+  $cache = '';
+  if(isset($_GET['eraseCache'])){
+    echo '<meta http-equiv="Cache-control" content="no-cache">';
+    echo '<meta http-equiv="Expires" content="-1">';
+    $cache = '?'.time();
+  }
+?>
 <meta charset="utf-8">
 <title>FeedWax - Curate local information sources, news, photos, video and social media</title>
 <meta name="description" content="FeedWax helps you curate sources covering things happening in your local area right now. Create location-aware media streams including news, photos, videos, social media, and data, and feed them into n0tice.com or any RSS-friendly platform or content management system.">
