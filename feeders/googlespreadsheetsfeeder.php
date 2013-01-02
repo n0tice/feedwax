@@ -61,9 +61,18 @@ foreach ($newArray as $v) {
 
 	if ((empty($v['lat'])) && (!empty($v['postcode'])) && (!empty($v['url']))) {
 	$fulladdress = $v['address'].",".$v['city'].",".$v['postcode'];
-	$place_url="https://maps.googleapis.com/maps/api/place/textsearch/json?query=".urlencode($fulladdress)."&sensor=true&key=".$google_key;
+		$place_url="https://maps.googleapis.com/maps/api/place/textsearch/json?query=".urlencode($fulladdress)."&sensor=true&key=".$google_key;
 		$place_string .= file_get_contents($place_url); // get json content
-		$place_array = json_decode($place_string, true); //json decoder
+		$place_array_check = json_decode($place_string, true); //json decoder
+
+		if($place_array_check[status] != "OK") {
+			$backup_place_url="https://maps.googleapis.com/maps/api/place/textsearch/json?query=".urlencode($v['postcode'])."&sensor=true&key=".$google_key;
+			$backup_place_string .= file_get_contents($backup_place_url); // get json content
+			$backup_place_array = json_decode($backup_place_string, true); //json decoder
+			$place_array = $backup_place_array;
+		} else {
+			$place_array = $place_array_check;
+		}
 		$lat = $place_array['results'][0]['geometry']['location']['lat'];
 		$long = $place_array['results'][0]['geometry']['location']['lng'];
 		$geolat = "     <geo:lat>".$lat."</geo:lat>\n";
@@ -120,7 +129,12 @@ unset($geolat);
 unset($geolong);
 unset($place_url);
 unset($place_string);
+unset($place_array_check);
+unset($backup_place_url);
+unset($backup_place_string);
+unset($backup_place_array);
 unset($place_array);
+
 $z++;
 }
 unset($titleformat);
