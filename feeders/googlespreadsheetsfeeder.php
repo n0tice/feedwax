@@ -5,7 +5,6 @@ echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
 
 $spreadsheet_key = $_GET['spreadsheet_key'];
 if ($_GET['hashtag']) {$hashtag = " #".$_GET['hashtag'];}
-if ($_GET['titleformat'] = "joined") {$titleformat = "joined";}
  
 // Set your CSV feed
 $feed = 'https://docs.google.com/spreadsheet/pub?key='.$spreadsheet_key.'&oe=utf-8&single=true&output=csv';
@@ -14,7 +13,6 @@ $feed = 'https://docs.google.com/spreadsheet/pub?key='.$spreadsheet_key.'&oe=utf
 $keys = array();
 $newArray = array();
  
-// Function to convert CSV into associative array
 function csvToArray($file, $delimiter) { 
   if (($handle = fopen($file, 'r')) !== FALSE) { 
     $i = 0; 
@@ -29,34 +27,24 @@ function csvToArray($file, $delimiter) {
   return $arr; 
 } 
 
-// Do it
 $data = csvToArray($feed, ',');
- 
-// Set number of elements (minus 1 because we shift off the first row)
 $count = count($data) - 1;
- 
-//Use first row for names  
 $labels = array_shift($data);  
  
 foreach ($labels as $label) {
   $keys[] = $label;
 }
  
-// Add Ids, just in case we want them later
 $keys[] = 'id';
  
 for ($i = 0; $i < $count; $i++) {
   $data[$i][] = $i;
 }
  
-// Bring it all together
 for ($j = 0; $j < $count; $j++) {
   $d = array_combine($keys, $data[$j]);
   $newArray[$j] = $d;
 }
- 
-// Print it out as JSON
-#echo json_encode($newArray);
 ?>
 
 <rss version="2.0" 
@@ -68,7 +56,7 @@ for ($j = 0; $j < $count; $j++) {
     <link>http://feedwax.com/</link>
     <description>Google spreadsheet RSS feed powered by FeedWax</description>
 <?php
-$i = 0; 
+$z = 0; 
 foreach ($newArray as $v) {
 
 	if ((empty($v['lat'])) && (!empty($v['postcode'])) && (!empty($v['url']))) {
@@ -105,7 +93,7 @@ foreach ($newArray as $v) {
 		$rsslink = "https://maps.google.com/maps?q=".urlencode($v['title'])."&amp;hl=en";
 	}
 	
-	if ($titleformat = "joined") {
+	if ($titleformat == "joined") {
 			$title = "     <title><![CDATA[".str_replace('&', '&amp;', $v['title'])." - ".htmlspecialchars($v['description']).$tag.$hashtag."]]></title>\n";
 			$description = "     <description> </description>\n";
 		} else {
@@ -133,8 +121,9 @@ unset($geolong);
 unset($place_url);
 unset($place_string);
 unset($place_array);
-$i++;
+$z++;
 }
+unset($titleformat);
 
 ?>
 </channel>
