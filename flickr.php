@@ -107,7 +107,6 @@ $warningmessage = "<strong>Photo re-use guidelines:</strong> The results below a
 echo "<div class=\"alert span7\">";
 echo $warningmessage;
 echo "</div>";
-
 echo "<button class=\"btn btn-large btn-primary span4 align-right\" type=\"submit\">feed this into n0tice</button>";
 echo "</form>";
 

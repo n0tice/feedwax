@@ -47,12 +47,12 @@ include('nav.php');
 <div class="well">
 <table class="table">
 <tr><td><form action="" method="GET" >
-    <input type="hidden" class="text" value="<?php if($_GET['q']) { echo $_GET['q']; } else { echo "*"; } ?>" name="q" />
 	<input type="hidden" value="<?php if($_GET['maxresults']) { echo $_GET['maxresults']; } else { echo "10"; } ?>" name="maxresults" />
     Lat: <input type="text" class="text" value="<?php echo $lat; ?>" name="lat" /><br>
     Long: <input type="text" class="text" value="<?php echo $long; ?>" name="long" /><br>
     Radius: <input type="text" class="input-mini" value="<?php if($_GET['radius']) { echo $_GET['radius']; } else { echo "10"; } ?>" name="radius" />(km)<br>
 	License: <input type="radio" class="radio" value="cc" name="license" <?php if($_GET['license'] != "all") {echo "checked";} ?>/> CC only <input type="radio" class="text" value="all" name="license" <?php if($_GET['license'] == "all") {echo "checked";} ?>/> All<br>
+    Search Terms: <input type="text" class="text input-small" value="<?php if($_GET['q']) { echo $_GET['q']; } else { echo ""; } ?>" name="q" placeholder="*" /><br><small>(use * to search for all photos in an area)</small>
 
 <button type="submit" value="build feed" class="btn"><i class="icon-fire"></i> build feed</button>
 </form></td>
@@ -87,11 +87,14 @@ $n0ticefeed_url="http://" . $_SERVER['SERVER_NAME'] . "/feeders/flickrfeed.php?"
 
 echo "<form action=\"http://feedton0tice.com/feeds/new\" method=\"GET\">\n";
 echo "<input type=\"hidden\" name=\"url\" value=\"" . $n0ticefeed_url . "\">";
-?>
-<div class="alert span7">
-  <strong>Photo re-use guidelines:</strong> The results below all include a Creative Commons license and permit commercial use.  As always, you may wish to notify the copyright owner when you publish someone's photos.
-</div>
-<?php
+if ($_GET['license'] == "all") {
+$warningmessage = "<strong>Photo re-use guidelines:</strong> The results below have varying license rights and may have use restrictions.  Be sure to get permission and notify the copyright owner when you publish someone's photos.";
+} else {
+$warningmessage = "<strong>Photo re-use guidelines:</strong> The results below all include a Creative Commons license and permit commercial use.  As always, you may wish to notify the copyright owner when you publish someone's photos.";
+}
+echo "<div class=\"alert span7\">";
+echo $warningmessage;
+echo "</div>";
 echo "<button class=\"btn btn-large btn-primary span4 align-right\" type=\"submit\">feed this into n0tice</button>";
 echo "</form>";
 
