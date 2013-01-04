@@ -20,14 +20,20 @@ if ($_GET['hashtag']) {$hashtag = " #".$_GET['hashtag'];}
 $z = 0; 
 foreach ($newArray as $v) {
 
-	if ((empty($v['lat'])) && (!empty($v['postcode'])) && (!empty($v['url']))) {
+	if ((empty($v['lat'])) && (!empty($v['postcode']))) {
 	$fulladdress = $v['address'].",".$v['city'].",".$v['postcode'];
-		$place_url="https://maps.googleapis.com/maps/api/place/textsearch/json?query=".urlencode($fulladdress)."&sensor=true&key=".$google_key;
-		$place_string .= file_get_contents($place_url); // get json content
-		$place_array_check = json_decode($place_string, true); //json decoder
+		if (is_numeric($v['postcode'])) {	
+			$place_url="http://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($fulladdress)."&sensor=true";
+			$place_string .= file_get_contents($place_url); // get json content
+			$place_array_check = json_decode($place_string, true); //json decoder
+		} else {
+			$place_url="http://maps.googleapis.com/maps/api/geocode/json?address=".urlencode($v['postcode'])."&sensor=true";
+			$place_string .= file_get_contents($place_url); // get json content
+			$place_array_check = json_decode($place_string, true); //json decoder		
+		}
 
 		if($place_array_check[status] != "OK") {
-			$backup_place_url="https://maps.googleapis.com/maps/api/place/textsearch/json?query=".urlencode($v['postcode'])."&sensor=true&key=".$google_key;
+			$backup_place_url="https://maps.googleapis.com/maps/api/place/textsearch/json?query=".urlencode($fulladdress)."&sensor=true&key=".$google_key;
 			$backup_place_string .= file_get_contents($backup_place_url); // get json content
 			$backup_place_array = json_decode($backup_place_string, true); //json decoder
 			$place_array = $backup_place_array;
@@ -38,7 +44,7 @@ foreach ($newArray as $v) {
 		$long = $place_array['results'][0]['geometry']['location']['lng'];
 		$geolat = "     <geo:lat>".$lat."</geo:lat>\n";
 		$geolong = "     <geo:long>".$long."</geo:long>\n";
-	} elseif(!empty($v['lat'])) {
+	} elseif ((isset($v['lat'])) && (isset($v['long']))) {
 		$geolat = "     <geo:lat>".$v['lat']."</geo:lat>\n";
 		$geolong = "     <geo:long>".$v['long']."</geo:long>\n";
 	}
@@ -55,7 +61,7 @@ foreach ($newArray as $v) {
 		$urlpieces = explode("http://", $originalurl);
 		if ($urlpieces[0] != "") {$rsslink = "http://".$urlpieces[0];} else {$rsslink = "http://".$urlpieces[1];}
 	} else {
-		$rsslink = "https://maps.google.com/maps?q=".urlencode($v['title'])."&amp;hl=en";
+		$rsslink = "https://maps.google.com/maps?q=".urlencode($v['title'])."+".$fulladdress."&amp;hl=en";
 	}
 	
 	if (empty($_GET['title']) && (!empty($v['title']))) {
