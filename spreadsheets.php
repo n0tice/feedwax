@@ -44,11 +44,8 @@ if ($_GET) {
 		}
 	}
 	echo "    </select><br>\n";
-	?>
-	<input type="hidden" value="<?php if($_GET['spreadsheet_url']) { echo urldecode($_GET['spreadsheet_url']); } else { echo ""; } ?>" name="spreadsheet_url"/>
-	
-	<?php
-	$n0ticefeed_url="http://feedwax.com/feeders/googlespreadsheetsfeeder.php?title=".urlencode($_GET['title'])."&description=".urlencode($_GET['description']);
+
+	$n0ticefeed_url="http://feedwax.com/feeders/googlespreadsheetsfeeder.php?title=".urlencode($_GET['title'])."&description=".urlencode($_GET['description'])."&spreadsheet_url=".urlencode($_GET['spreadsheet_url']);
 	$content = file_get_contents($n0ticefeed_url);
 	$xml = @simplexml_load_string($content);
 	?>
@@ -74,30 +71,31 @@ if ($_GET) {
 	echo "  </thead>";
 	echo "  <tbody class=\"well\">";
 	
+	echo "title: ".$xml->channel->item[0]->title; 
 	$i = 0;
 	foreach ($xml->channel->item as $v) {
-		$namespaces = $v->getNameSpaces(true);
-		$geo = $v->children($namespaces['geo']); 
-
-		$geocoder_url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=$geo->lat,$geo->long&sensor=false";
-		$geocoder_string .= file_get_contents($geocoder_url); // get json content
-		$geocoder_array = json_decode($geocoder_string, true); //json decoder
-
-		echo "<tr><td>";
-		echo $v->title;
-		echo "</td><td>\n";
-		echo $v->description;
-		echo "</td><td>\n";
-		if ($geo->lat) {
-			echo "<a href=\"https://maps.google.co.uk/maps?q=$geo->lat,$geo->long&ll=$geo->lat,$geo->long&z=10\">" . $geocoder_array['results'][0]['formatted_address'] . "</a>";
-		} else {
-			echo "No location available.";
+			$namespaces = $v->getNameSpaces(true);
+			$geo = $v->children($namespaces['geo']); 
+	
+			$geocoder_url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=$geo->lat,$geo->long&sensor=false";
+			$geocoder_string .= file_get_contents($geocoder_url); // get json content
+			$geocoder_array = json_decode($geocoder_string, true); //json decoder
+	
+			echo "<tr><td>";
+			echo $v->title;
+			echo "</td><td>\n";
+			echo $v->description;
+			echo "</td><td>\n";
+			if ($geo->lat) {
+				echo "<a href=\"https://maps.google.co.uk/maps?q=$geo->lat,$geo->long&ll=$geo->lat,$geo->long&z=10\">" . $geocoder_array['results'][0]['formatted_address'] . "</a>";
+			} else {
+				echo "No location available.";
+			}
+			echo "</td></tr>\n";
+			unset($geocoder_url);
+			unset($geocoder_string);
+			unset($geocoder_array);
 		}
-		echo "</td></tr>\n";
-		unset($geocoder_url);
-		unset($geocoder_string);
-		unset($geocoder_array);
-	}
 	echo "  </tbody>";
 	echo "  </table>";
 	

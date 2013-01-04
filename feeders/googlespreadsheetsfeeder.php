@@ -61,7 +61,7 @@ foreach ($newArray as $v) {
 		$urlpieces = explode("http://", $originalurl);
 		if ($urlpieces[0] != "") {$rsslink = "http://".$urlpieces[0];} else {$rsslink = "http://".$urlpieces[1];}
 	} else {
-		$rsslink = "https://maps.google.com/maps?q=".urlencode($v['title'])."+".$fulladdress."&amp;hl=en";
+		$rsslink = "https://maps.google.com/maps?q=".urlencode($v['title'])."+".urlencode($fulladdress)."&amp;hl=en";
 	}
 	
 	if (empty($_GET['title']) && (!empty($v['title']))) {
