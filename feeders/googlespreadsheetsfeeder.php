@@ -1,50 +1,11 @@
 <?php
 include('../config/globals.php');
+include('googlespreadsheetsfunctions.php');
 header('Content-type: application/rss+xml; charset=utf-8');
+
 echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
 
-$spreadsheet_key = $_GET['spreadsheet_key'];
 if ($_GET['hashtag']) {$hashtag = " #".$_GET['hashtag'];}
- 
-// Set your CSV feed
-$feed = 'https://docs.google.com/spreadsheet/pub?key='.$spreadsheet_key.'&oe=utf-8&single=true&output=csv';
- 
-// Arrays we'll use later
-$keys = array();
-$newArray = array();
- 
-function csvToArray($file, $delimiter) { 
-  if (($handle = fopen($file, 'r')) !== FALSE) { 
-    $i = 0; 
-    while (($lineArray = fgetcsv($handle, 6000, $delimiter, '"')) !== FALSE) { 
-      for ($j = 0; $j < count($lineArray); $j++) { 
-        $arr[$i][$j] = $lineArray[$j]; 
-      } 
-      $i++; 
-    } 
-    fclose($handle); 
-  } 
-  return $arr; 
-} 
-
-$data = csvToArray($feed, ',');
-$count = count($data) - 1;
-$labels = array_shift($data);  
- 
-foreach ($labels as $label) {
-  $keys[] = $label;
-}
- 
-$keys[] = 'id';
- 
-for ($i = 0; $i < $count; $i++) {
-  $data[$i][] = $i;
-}
- 
-for ($j = 0; $j < $count; $j++) {
-  $d = array_combine($keys, $data[$j]);
-  $newArray[$j] = $d;
-}
 ?>
 
 <rss version="2.0" 
@@ -88,11 +49,6 @@ foreach ($newArray as $v) {
 	if (!empty($v['tag'])) {
 		$tag = " #".$v['tag'];
 	}
-	if (!empty($v['description'])) {
-		$description = "     <description><![CDATA[".$v['description']."]]></description>\n";
-	} else {
-		$description = "     <description> </description>\n";
-	}
 	
 	if (!empty($v['url'])) {
 		$originalurl  = $v['url'];
@@ -102,12 +58,24 @@ foreach ($newArray as $v) {
 		$rsslink = "https://maps.google.com/maps?q=".urlencode($v['title'])."&amp;hl=en";
 	}
 	
-	if ($titleformat == "joined") {
-			$title = "     <title><![CDATA[".str_replace('&', '&amp;', $v['title'])." - ".htmlspecialchars($v['description']).$tag.$hashtag."]]></title>\n";
-			$description = "     <description> </description>\n";
-		} else {
-			$title = "     <title>".str_replace('&', '&amp;', $v['title']).$tag.$hashtag."</title>\n";
-		}
+	if (empty($_GET['title']) && (!empty($v['title']))) {
+		$title = "     <title>".str_replace('&', '&amp;', $v['title']).$tag.$hashtag."</title>\n";
+	} else {
+		$title_value = $_GET['title'];
+		$title_data = htmlentities(urldecode($v[$title_value]));
+		$title = "     <title>".$title_data.$tag.$hashtag."</title>\n";
+		unset($label_value);
+	}
+
+	if (empty($_GET['description']) && (!empty($v['description']))) {
+		$description = "     <description><![CDATA[".$v['description']."]]></description>\n";
+	} elseif (!empty($_GET['description'])) {
+		$description_value = $_GET['description'];
+		$description_data = htmlentities(urldecode($v[$description_value]));
+		$description = "     <description><![CDATA[".$description_data."]]></description>\n";
+	} else {
+		$description = "     <description> </description>\n";
+	}
 
 	$pubdate = date("D, d M Y H:i:s O");
 
