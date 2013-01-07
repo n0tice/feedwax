@@ -57,16 +57,19 @@ if ($_GET) {
 
 	echo "Image: ";
 	echo "<select name=\"image\" class=\"selectpicker\"/>\n";
+	if ($_GET['image'] == "none") {
+			$selected = "selected";
+		}
+	echo "    <option value=\"none\" ".$selected."> - No image - </option>\n";
 	foreach ($labels as $label) {
 		if (isset($_GET['image']) && ($_GET['image'] == $label)) {
-			echo "    <option value=\"".$label."\" selected>".$label."</option>\n";
-		} elseif ($label == "image") {
 			echo "    <option value=\"".$label."\" selected>".$label."</option>\n";
 		} else {
 			echo "    <option value=\"".$label."\">".$label."</option>\n";
 		}
 	}
 	echo "    </select><br>\n";
+	unset($selected);
 
 	$n0ticefeed_url="http://feedwax.com/feeders/googlespreadsheetsfeeder.php?".$_SERVER['QUERY_STRING'];
 	$content = file_get_contents($n0ticefeed_url);
