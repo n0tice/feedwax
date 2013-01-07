@@ -6,8 +6,6 @@ include('googlespreadsheetsfunctions.php');
 
 
 echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
-
-if ($_GET['hashtag']) {$hashtag = " #".$_GET['hashtag'];}
 ?>
 
 <rss version="2.0" 
@@ -42,6 +40,9 @@ foreach ($newArray as $v) {
 	if (!empty($v['image'])) {
 		$mediacontent = "     <media:content url=\"" . $v['image'] . "\" type=\"image/jpeg\"></media:content>\n";
 	}
+
+	if ($_GET['hashtag']) {$hashtag = " #".$_GET['hashtag'];}
+
 	if (!empty($v['tag'])) {
 		$tag = " #".$v['tag'];
 	}
@@ -53,33 +54,37 @@ foreach ($newArray as $v) {
 	} else {
 		$rsslink = "https://maps.google.com/maps?q=".urlencode($v['title'])."+".urlencode($fulladdress)."&amp;hl=en";
 	}
-	
-	if (empty($_GET['title']) && (!empty($v['title']))) {
-		$title = "     <title>".str_replace('&', '&amp;', $v['title']).$tag.$hashtag."</title>\n";
-	} else {
-		$title_value = $_GET['title'];
-		$title_data = htmlentities(urldecode($v[$title_value]));
-		$title = "     <title>".$title_data.$tag.$hashtag."</title>\n";
-		unset($label_value);
-	}
-
-	if (empty($_GET['description']) && (!empty($v['description']))) {
-		$description = "     <description><![CDATA[".$v['description']."]]></description>\n";
-	} elseif (!empty($_GET['description'])) {
-		$description_value = $_GET['description'];
-		$description_data = htmlentities(urldecode($v[$description_value]));
-		$description = "     <description><![CDATA[".$description_data."]]></description>\n";
-	} else {
-		$description = "     <description> </description>\n";
-	}
 
 	$pubdate = date("D, d M Y H:i:s O");
 
 	echo "<item>\n";
-		echo $title;
-		#echo $place_url;
-		#print_r($place_array['results'][0]);
-		echo $description;
+		echo "     <title>";
+		if (empty($_GET['title'])) {
+			echo str_replace('&', '&amp;', $v['title']);
+		} elseif (isset($_GET['title'])) {
+			foreach ($labels as $label) {
+				for($num=0;$num<count($_GET["title"]);$num++){
+					if ($_GET["title"][$num] == $label) {
+						echo $v[$label]." ";
+					}
+				}
+			}		
+		}
+		echo $tag.$hashtag;
+		echo "</title>\n";
+		echo "     <description><![CDATA[";
+		if (empty($_GET['description'])) {
+			echo $v['description'];
+		} elseif (isset($_GET['description'])) {
+			foreach ($labels as $label) {
+				for($num=0;$num<count($_GET["description"]);$num++){
+					if ($_GET["description"][$num] == $label) {
+						echo $v[$label]." ";
+					}
+				}
+			}		
+		}
+		echo "]]></description>\n";
 		echo $geolat;
 		echo $geolong;
 		echo $mediacontent;
