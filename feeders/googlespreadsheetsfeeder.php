@@ -37,24 +37,12 @@ foreach ($newArray as $v) {
 		$geolong = "     <geo:long>".$long."</geo:long>\n";
 	}
 
-	if (!empty($v['image'])) {
-		$mediacontent = "     <media:content url=\"" . $v['image'] . "\" type=\"image/jpeg\"></media:content>\n";
-	}
-
 	if ($_GET['hashtag']) {$hashtag = " #".$_GET['hashtag'];}
 
 	if (!empty($v['tag'])) {
 		$tag = " #".$v['tag'];
 	}
 	
-	if (!empty($v['url'])) {
-		$originalurl  = $v['url'];
-		$urlpieces = explode("http://", $originalurl);
-		if ($urlpieces[0] != "") {$rsslink = "http://".$urlpieces[0];} else {$rsslink = "http://".$urlpieces[1];}
-	} else {
-		$rsslink = "https://maps.google.com/maps?q=".urlencode($v['title'])."+".urlencode($fulladdress)."&amp;hl=en";
-	}
-
 	$pubdate = date("D, d M Y H:i:s O");
 
 	echo "<item>\n";
@@ -87,10 +75,35 @@ foreach ($newArray as $v) {
 		echo "]]></description>\n";
 		echo $geolat;
 		echo $geolong;
-		echo $mediacontent;
-		echo "     <pubDate>".$pubdate."</pubDate>\n";
+
+		if (empty($_GET['image'])) {
+			$imageurl = $v['image'];
+		} elseif (isset($_GET['image'])) {
+			foreach ($labels as $label) {
+				if ($_GET['image'] == $label) {
+					$imageurl = $v[$label];
+				}
+			}		
+		}
+		if ($imageurl != "") {
+			echo "     <media:content url=\"" . $imageurl . "\" type=\"image/jpeg\"></media:content>\n";
+		}	
+		if (empty($_GET['url'])) {
+			$originalurl = $v['url'];
+			$urlpieces = explode("http://", $originalurl);
+			if ($urlpieces[0] != "") {$rsslink = "http://".$urlpieces[0];} else {$rsslink = "http://".$urlpieces[1];}
+		} elseif (isset($_GET['url'])) {
+			foreach ($labels as $label) {
+				if ($_GET['url'] == $label) {
+					$originalurl = $v[$label];
+				}
+			}		
+			$urlpieces = explode("http://", $originalurl);
+			if ($urlpieces[0] != "") {$rsslink = "http://".$urlpieces[0];} else {$rsslink = "http://".$urlpieces[1];}
+		}
 		echo "     <link>".$rsslink."</link>\n";
 		echo "     <guid>".$rsslink."</guid>\n";
+		echo "     <pubDate>".$pubdate."</pubDate>\n";
 	echo "</item>\n";
 
 unset($place_url);

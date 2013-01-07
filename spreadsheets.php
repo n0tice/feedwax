@@ -42,7 +42,33 @@ if ($_GET) {
 	}
 	echo "    </select><br>\n";
 
-	$n0ticefeed_url="http://feedwax.com/feeders/googlespreadsheetsfeeder.php?spreadsheet_url=".urlencode($_GET['spreadsheet_url']);
+	echo "Link: ";
+	echo "<select name=\"url\" class=\"selectpicker\"/>\n";
+	foreach ($labels as $label) {
+		if (isset($_GET['url']) && ($_GET['url'] == $label)) {
+			echo "    <option value=\"".$label."\" selected>".$label."</option>\n";
+		} elseif ($label == "url") {
+			echo "    <option value=\"".$label."\" selected>".$label."</option>\n";
+		} else {
+			echo "    <option value=\"".$label."\">".$label."</option>\n";
+		}
+	}
+	echo "    </select><br>\n";
+
+	echo "Image: ";
+	echo "<select name=\"image\" class=\"selectpicker\"/>\n";
+	foreach ($labels as $label) {
+		if (isset($_GET['image']) && ($_GET['image'] == $label)) {
+			echo "    <option value=\"".$label."\" selected>".$label."</option>\n";
+		} elseif ($label == "image") {
+			echo "    <option value=\"".$label."\" selected>".$label."</option>\n";
+		} else {
+			echo "    <option value=\"".$label."\">".$label."</option>\n";
+		}
+	}
+	echo "    </select><br>\n";
+
+	$n0ticefeed_url="http://feedwax.com/feeders/googlespreadsheetsfeeder.php?".$_SERVER['QUERY_STRING'];
 	$content = file_get_contents($n0ticefeed_url);
 	$xml = @simplexml_load_string($content);
 	?>
@@ -97,7 +123,7 @@ if ($_GET) {
 	echo "<button type=\"submit\" value=\"build feed\" class=\"btn\"><i class=\"icon-fire\"></i> build feed</button>";
 	echo "</form>\n</div>";
 }
-	echo "<p align=\"right\"><a href=\"http://feedwax.com/feeders/googlespreadsheetsfeeder.php?".$_SERVER['QUERY_STRING']."\">RSS</a></p>";
+	echo "<p align=\"right\"><a href=\"".$n0ticefeed_url."\">RSS</a></p>";
 
 ?>
 
