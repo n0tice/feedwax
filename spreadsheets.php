@@ -4,11 +4,7 @@ include('header.php');
 include('nav.php');
 
 ?>
-<script>
-$('.selectpicker').selectpicker({
-      btnStyle: 'btn-info'
-    });
-</script>
+
 <div class="hero-unit">
 <h1>Build a feed from a spreadsheet</h1>
 <strong>Guidelines:</strong> Your spreadsheet must be publicly shared (<a href="https://support.google.com/drive/bin/answer.py?hl=en&answer=37579">here's how to do that</a>...don't forget to click the 'Publish to web' button and <em>"Start Publishing"</em>).  It's also helpful to use these column titles: <em>title, description, url</em> and <em>lat, long</em>.  You can also use <em>address, city, postcode</em>, but location accuracy may vary.  You can optionally include <em>pubdate, image</em>.<br>
@@ -54,12 +50,11 @@ if ($_GET) {
 	</form>
 	</div>
 	<?php
-	#echo $n0ticefeed_url;
 	echo "<form action=\"http://feedton0tice.com/feeds/new\" method=\"GET\">\n";
 	echo "<input type=\"hidden\" name=\"url\" value=\"" . $n0ticefeed_url . "\">";
 	echo "<button class=\"btn btn-large btn-primary span4 align-right\" type=\"submit\">feed this into n0tice</button>";
 	echo "</form>";
-	
+
 	echo "<table class=\"table\" width=\"100%\">";
 	
 	echo " <thead>";
@@ -71,23 +66,17 @@ if ($_GET) {
 	echo "  </thead>";
 	echo "  <tbody class=\"well\">";
 	
-	echo "title: ".$xml->channel->item[0]->title; 
 	$i = 0;
 	foreach ($xml->channel->item as $v) {
 			$namespaces = $v->getNameSpaces(true);
 			$geo = $v->children($namespaces['geo']); 
-	
-			$geocoder_url = "http://maps.googleapis.com/maps/api/geocode/json?latlng=$geo->lat,$geo->long&sensor=false";
-			$geocoder_string .= file_get_contents($geocoder_url); // get json content
-			$geocoder_array = json_decode($geocoder_string, true); //json decoder
-	
 			echo "<tr><td>";
 			echo $v->title;
 			echo "</td><td>\n";
 			echo $v->description;
 			echo "</td><td>\n";
 			if ($geo->lat) {
-				echo "<a href=\"https://maps.google.co.uk/maps?q=$geo->lat,$geo->long&ll=$geo->lat,$geo->long&z=10\">" . $geocoder_array['results'][0]['formatted_address'] . "</a>";
+				echo "<a href=\"https://maps.google.co.uk/maps?q=$geo->lat,$geo->long&ll=$geo->lat,$geo->long&z=10\"><img src=\"http://maps.googleapis.com/maps/api/staticmap?center=$geo->lat,$geo->long&zoom=15&size=100x100&maptype=roadmap&sensor=true\"</a>";
 			} else {
 				echo "No location available.";
 			}
@@ -107,6 +96,9 @@ if ($_GET) {
 	echo "<button type=\"submit\" value=\"build feed\" class=\"btn\"><i class=\"icon-fire\"></i> build feed</button>";
 	echo "</form>\n</div>";
 }
+	echo "<p align=\"right\"><a href=\"".$n0ticefeed_url."\">RSS</a></p>";
+
 ?>
+
 
 <?php include('footer.php'); ?>
