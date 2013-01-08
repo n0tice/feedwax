@@ -14,16 +14,44 @@ echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
       xmlns:media="http://search.yahoo.com/mrss/">
 <channel>
     <title>Google spreadsheet RSS feed</title>
-    <link><?php echo urldecode($_GET['spreadsheet_url']); ?></link>
+    <link><?php echo htmlentities(urldecode($_GET['spreadsheet_url'])); ?></link>
     <description>Google spreadsheet RSS feed powered by FeedWax</description>
 <?php
 $z = 0; 
 foreach ($newArray as $v) {
+
 	if ((isset($v['lat'])) && (isset($v['long']))) {
-		$geolat = "     <geo:lat>".$v['lat']."</geo:lat>\n";
-		$geolong = "     <geo:long>".$v['long']."</geo:long>\n";
+		$lat = $v['lat'];
+		$long = $v['long'];
+	} elseif (isset($_GET["geocodefield"])) {
+		foreach ($labels as $label) {
+			for($num=0;$num<count($_GET["geocodefield"]);$num++){
+				if ($_GET["geocodefield"] == $label) {
+					$latlong = explode(",", $v[$label]);
+					$lat = $latlong[0];
+					$long = $latlong[1];
+				}
+			}
+		}
+		unset($latlong);		
+	} elseif (isset($_GET["location"])) {
+		foreach ($labels as $label) {
+			for($num=0;$num<count($_GET["location"]);$num++){
+				if ($_GET["location"][$num] == $label) {
+					$lookup[] = $v[$label];
+				}
+			}
+		}
+		$lookup = $lookup[0].",".$lookup[1].",".$lookup[2].",".$lookup[3];
+		$place_url="https://maps.googleapis.com/maps/api/place/textsearch/json?query=".urlencode($lookup)."&sensor=true&key=".$google_key;
+		$place_string .= file_get_contents($place_url); // get json content
+		$place_array = json_decode($place_string, true); //json decoder		
+		$lat = $place_array['results'][0]['geometry']['location']['lat'];
+		$long = $place_array['results'][0]['geometry']['location']['lng'];
+		unset($lookup);
 	} elseif (isset($v['postcode'])) {
 		$fulladdress = $v['address'].",".$v['city'].",".$v['postcode'];
+		
 		if (is_numeric($v['postcode'])) {	
 			$place_url="https://maps.googleapis.com/maps/api/place/textsearch/json?query=".urlencode($fulladdress)."&keyword=".urlencode($v['address'])."&sensor=true&key=".$google_key;
 		} else {
@@ -33,9 +61,11 @@ foreach ($newArray as $v) {
 		$place_array = json_decode($place_string, true); //json decoder		
 		$lat = $place_array['results'][0]['geometry']['location']['lat'];
 		$long = $place_array['results'][0]['geometry']['location']['lng'];
-		$geolat = "     <geo:lat>".$lat."</geo:lat>\n";
-		$geolong = "     <geo:long>".$long."</geo:long>\n";
-	}
+		unset($fulladdress);
+	} 
+	
+	$geolat = "     <geo:lat>".$lat."</geo:lat>\n";
+	$geolong = "     <geo:long>".$long."</geo:long>\n";
 
 	if ($_GET['hashtag']) {$hashtag = " #".$_GET['hashtag'];}
 
@@ -109,10 +139,11 @@ foreach ($newArray as $v) {
 unset($place_url);
 unset($place_string);
 unset($place_array);
+unset($lat);
+unset($long);
 
 $z++;
 }
-
 ?>
 </channel>
 </rss>

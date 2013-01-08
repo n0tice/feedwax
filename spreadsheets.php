@@ -16,8 +16,10 @@ include('nav.php');
 if ($_GET) {
 	if (!empty($_GET['spreadsheet_url'])) {
 	include('feeders/googlespreadsheetsfunctions.php');
-	echo "Headline: ";
-	echo "<select name=\"title[]\" class=\"selectpicker\" multiple=\"yes\"/>\n";
+	
+	echo "<table class=\"inline-block-level\">";
+	echo "<tr><td valign=\"top\">Headline: </td>";
+	echo "<td><select name=\"title[]\" class=\"selectpicker\" multiple=\"yes\"/>\n";
 	foreach ($labels as $label) {
 		for($num=0;$num<count($_GET["title"]);$num++){
 			if ($_GET["title"][$num] == $label) {
@@ -28,9 +30,10 @@ if ($_GET) {
 		unset($selected);
 	}
 	echo "    </select><br>\n";
+	echo "</td></tr>";
 
-	echo "Description: ";
-	echo "<select name=\"description[]\" class=\"selectpicker\" multiple=\"yes\"/>\n";
+	echo "<tr><td valign=\"top\">Description: </td>";
+	echo "<td><select name=\"description[]\" class=\"selectpicker\" multiple=\"yes\"/>\n";
 	foreach ($labels as $label) {
 		for($num=0;$num<count($_GET["description"]);$num++){
 			if ($_GET["description"][$num] == $label) {
@@ -41,9 +44,38 @@ if ($_GET) {
 		unset($selected);
 	}
 	echo "    </select><br>\n";
+	echo "</td></tr>";
 
-	echo "Link: ";
-	echo "<select name=\"url\" class=\"selectpicker\"/>\n";
+	echo "<tr><td valign=\"top\">Address field(s): </td>";
+	echo "<td><select name=\"location[]\" class=\"selectpicker\" multiple=\"yes\"/>\n";
+	foreach ($labels as $label) {
+		for($num=0;$num<count($_GET["location"]);$num++){
+			if ($_GET["location"][$num] == $label) {
+				$selected = "selected";
+			}
+		}
+		echo "    <option value=\"".$label."\" ".$selected.">".$label."</option>\n";	
+		unset($selected);
+	}
+	echo "    </select><br>\n";
+	echo "</td></tr>";
+
+	echo "<tr><td valign=\"top\">Geocode Field <em>(lat,long)</em>: *<br><small>e.g. 12.123,-0.456</small></td>";
+	echo "<td><select name=\"geocodefield\" class=\"selectpicker\"/>\n";
+	foreach ($labels as $label) {
+		if (isset($_GET['geocodefield']) && ($_GET['geocodefield'] == $label)) {
+			echo "    <option value=\"".$label."\" selected>".$label."</option>\n";
+		} elseif ($label == "url") {
+			echo "    <option value=\"".$label."\" selected>".$label."</option>\n";
+		} else {
+			echo "    <option value=\"".$label."\">".$label."</option>\n";
+		}
+	}
+	echo "    </select><br>\n";
+	echo "</td></tr>";
+
+	echo "<tr><td valign=\"top\">Link: </td>";
+	echo "<td><select name=\"url\" class=\"selectpicker\"/>\n";
 	foreach ($labels as $label) {
 		if (isset($_GET['url']) && ($_GET['url'] == $label)) {
 			echo "    <option value=\"".$label."\" selected>".$label."</option>\n";
@@ -54,9 +86,10 @@ if ($_GET) {
 		}
 	}
 	echo "    </select><br>\n";
+	echo "</td></tr>";
 
-	echo "Image: ";
-	echo "<select name=\"image\" class=\"selectpicker\"/>\n";
+	echo "<tr><td valign=\"top\">Image: *</td>";
+	echo "<td><select name=\"image\" class=\"selectpicker\"/>\n";
 	if ($_GET['image'] == "none") {
 			$selected = "selected";
 		}
@@ -69,6 +102,9 @@ if ($_GET) {
 		}
 	}
 	echo "    </select><br>\n";
+	echo "</td></tr></table>";
+	echo "<em>* optional</em>";
+
 	unset($selected);
 
 	$n0ticefeed_url="http://feedwax.com/feeders/googlespreadsheetsfeeder.php?".$_SERVER['QUERY_STRING'];

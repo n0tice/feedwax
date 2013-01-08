@@ -32,7 +32,8 @@ function csvToArray($file, $delimiter) {
 
 $data = csvToArray($feed, ',');
 $count = count($data) - 1;
-$labels = array_shift($data);  
+$labeldata = array_shift($data);  
+$labels =  array_map('strtolower',$labeldata);
  
 foreach ($labels as $label) {
   $keys[] = $label;
@@ -48,4 +49,5 @@ for ($j = 0; $j < $count; $j++) {
   $d = array_combine($keys, $data[$j]);
   $newArray[$j] = $d;
 }
+
 ?>
