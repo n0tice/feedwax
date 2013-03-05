@@ -18,6 +18,9 @@ if ($_GET['defaultloc']) {
 function explodeCommas($commalist) {
 	return explode(',', $commalist);
 }
+function explodeURL($url) {
+	return explode('/', $url);
+}
 
 if (!empty($_GET['altgeocode'])) {
 	list($defaultlat,$defaultlong) = explodeCommas($_GET['altgeocode']);
@@ -28,7 +31,7 @@ if (!empty($_GET['altgeocode'])) {
 $tag = urlencode($_GET['q']);
 $linkinfield = $_GET['linkinfield'];
 $rpp = $_GET['rpp'];
-$geocode = "&geocode=" . $_GET['geocode']; 
+if (isset($_GET['geocode'])) {$geocode = "&geocode=" . $_GET['geocode'];}
 
 $twitterapi_url="https://search.twitter.com/search.json?include_entities=true&q=" . $tag . $geocode . "&result_type=mixed&rpp=" . $rpp;
 $string .= file_get_contents($twitterapi_url); // get json content
@@ -42,7 +45,7 @@ echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
       xmlns:media="http://search.yahoo.com/mrss/">
 <channel>
     <title>Twitter: <?php echo urldecode($tag); ?></title>
-    <link><?php echo htmlentities($twitterapi_url); ?></link>
+    <link><?php echo $twitterapi_url; ?></link>
     <description>Tweets using the query <?php echo urldecode($tag); ?></description>
 
 <?php
@@ -50,7 +53,22 @@ $i = 0;
 foreach ($array['results'] as $v) {
 
 	if (!empty($v['entities']['media'][0]['media_url'])) {
-		$mediacontent = "<media:content url=\"" . $v['entities']['media'][0]['media_url'] . "\" type=\"image/jpeg\"></media:content>\n";
+		$ext = pathinfo($v['entities']['media'][0]['media_url'], PATHINFO_EXTENSION);
+		if ($ext == "png") {
+			$type = "png";
+		} else {
+			$type = "jpeg";
+		}
+		$mediacontent = "<media:content url=\"" . $v['entities']['media'][0]['media_url'] . "\" type=\"image/".$type."\"></media:content>\n";
+	} elseif ((empty($v['entities']['media'][0]['media_url'])) && (isset($v['entities']['urls'][0]['display_url']))) {
+		$imagehost_array = explodeURL($v['entities']['urls'][0]['display_url']);
+		$imagehost = $imagehost_array[0];
+		$imagehost_path = $imagehost_array[1];
+		if ($imagehost == "lockerz.com") {$image_source = "http://api.plixi.com/api/tpapi.svc/imagefromurl?url=".$v['entities']['urls'][0]['expanded_url']."&size=medium";}
+		if ($imagehost = "twitpic.com") {$image_source = "http://twitpic.com/show/large/".$imagehost_path;}
+		if (isset($image_source)) {
+			$mediacontent = "<media:content url=\"" . $image_source . "\" type=\"image/jpeg\"></media:content>\n";
+		}
 	} else {
 		$mediacontent = null;
 	}
