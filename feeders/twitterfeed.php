@@ -52,6 +52,7 @@ echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
 $i = 0; 
 foreach ($array['results'] as $v) {
 
+	$mediacontent = null;
 	if (!empty($v['entities']['media'][0]['media_url'])) {
 		$ext = pathinfo($v['entities']['media'][0]['media_url'], PATHINFO_EXTENSION);
 		if ($ext == "png") {
@@ -65,7 +66,7 @@ foreach ($array['results'] as $v) {
 		$imagehost = $imagehost_array[0];
 		$imagehost_path = $imagehost_array[1];
 		if ($imagehost == "lockerz.com") {$image_source = "http://api.plixi.com/api/tpapi.svc/imagefromurl?url=".$v['entities']['urls'][0]['expanded_url']."&size=medium";}
-		if ($imagehost = "twitpic.com") {$image_source = "http://twitpic.com/show/large/".$imagehost_path;}
+		if ($imagehost == "twitpic.com") {$image_source = "http://twitpic.com/show/large/".$imagehost_path;}
 		if (isset($image_source)) {
 			$mediacontent = "<media:content url=\"" . $image_source . "\" type=\"image/jpeg\"></media:content>\n";
 		}
@@ -111,6 +112,13 @@ foreach ($array['results'] as $v) {
 			echo "<guid>$url</guid>\n";
 		echo "</item>\n";
 	} 
+	unset($mediacontent);
+	unset($image_source);
+	unset($geolat);
+	unset($geolong);
+	unset($geodata);
+	unset($ext);
+	unset($imagehost_array);
 	$i++;
 }
 ?>
