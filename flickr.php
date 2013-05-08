@@ -162,6 +162,7 @@ echo "  </table>";
 include ('warning.php');
 }
 
+echo "<a href=\"http://feedton0tice.com/feeds/new?url=" . $n0ticefeed_url . "\"><img src=\"/img/rss1.png\" width=\"10\" align=\"right\"></a>";
 ?>
 
 <?php include('footer.php'); ?>
