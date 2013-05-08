@@ -31,11 +31,12 @@ $geonames_url = "http://ws.geonames.net/rssToGeoRSS?feedUrl=".urlencode($google_
 $n0ticefeed_url = "http://" . $_SERVER['SERVER_NAME'] . "/feeders/googlenewsfeeder.php?url=" . urlencode($google_url) . "&q=" . urlencode($_GET['q']) . "&source=googlenews&type=" . $_GET['type'] . "&LinkInTitle=true";
 $xml = simplexml_load_file($geonames_url); 
 #echo $geonames_url;
-echo "<form action=\"http://feedton0tice.com/feeds/new\" method=\"GET\">\n";
-echo "<input type=\"hidden\" name=\"url\" value=\"" . $n0ticefeed_url . "\">";
-echo "<table width=\"100%\"><tr><td><button class=\"btn btn-large btn-primary\" type=\"submit\">feed this into n0tice</button></td>";
+include ('policy-change.php');
+#echo "<form action=\"http://feedton0tice.com/feeds/new\" method=\"GET\">\n";
+#echo "<input type=\"hidden\" name=\"url\" value=\"" . $n0ticefeed_url . "\">";
+echo "<table width=\"100%\"><tr><td><button class=\"btn btn-large btn-disabled\" type=\"submit\"><strike>import into n0tice now</strike></button></td>";
 echo "<td align=\"right\"><a href=\"" . $n0ticefeed_url . "\"><img src=\"/img/rss1.png\" width=\"40\"></a></td></tr></table>";
-echo "</form>\n";
+#echo "</form>";
 #echo "<div class=\"navbar\">\n";
 #echo "    <a class=\"brand\" href=\"\">Results</a> \n";
 #echo "    <ul class=\"nav nav-tabs pull-right\">\n";
@@ -75,6 +76,7 @@ echo "  </tbody></table>";
 include ('warning.php');
 }
 
+echo "<a href=\"http://feedton0tice.com/feeds/new?url=" . $n0ticefeed_url . "\"><img src=\"/img/rss1.png\" width=\"10\" align=\"right\"></a>";
 include('footer.php'); 
 
 ?>

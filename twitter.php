@@ -1,11 +1,50 @@
 <?php
-header('Content-type: application/rss+xml; charset=utf-8');
-header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-header("Cache-Control: no-cache");
-header("Pragma: no-cache");
-include('../config/globals.php');
+if ($_GET['accountKey']) {
+	$accountKey = $_GET['accountKey']; 
+		} else { 
+	$accountKey = $twitter_key;
+}
+if ($_GET['lat']) {
+	$lat = $_GET['lat']; 
+		} else { 
+	$lat = "";
+}
+if (empty($_GET['q'])) {
+	$q = "pic.twitter.com";
+		} else { 
+	$q = $_GET['q']; 
+}
+if ($_GET['long']) {
+	$long = $_GET['long']; 
+		} else { 
+	$long = "";
+}
+if ($_GET['radius']) {
+	$radius = $_GET['radius']; 
+		} else { 
+	$radius = "5";
+}
+if ($_GET['assignedlat']) {
+	$assignedlat = $_GET['assignedlat']; 
+		} else { 
+	$assignedlat = "";
+}
+if ($_GET['assignedlong']) {
+	$assignedlong = $_GET['assignedlong']; 
+		} else { 
+	$assignedlong = "";
+}
 
-if (!empty($_GET['media'])) {
+$radiusmi = $radius . "mi";
+if ($lat && $long) {$geocode = "&geocode=$lat,$long,$radiusmi";}
+if ($_GET['assignedlat'] && $_GET['assignedlong']) {$altgeocode = "&altgeocode=".$_GET['assignedlat'].",".$_GET['assignedlong'];}
+
+if ($_GET['rpp']) {
+	$rpp = $_GET['rpp']; 
+		} else { 
+	$rpp = "20";
+}
+if ($_GET['media']) {
 	$media = $_GET['media']; 
 		} else { 
 	$media = "all";
@@ -15,112 +54,104 @@ if ($_GET['defaultloc']) {
 		} else { 
 	$defaultloc = "exclude";
 }
-function explodeCommas($commalist) {
-	return explode(',', $commalist);
-}
-function explodeURL($url) {
-	return explode('/', $url);
-}
 
-if (!empty($_GET['altgeocode'])) {
-	list($defaultlat,$defaultlong) = explodeCommas($_GET['altgeocode']);
-		} else { 
-	list($defaultlat,$defaultlong) = explodeCommas($_GET['geocode']);
-}
+include('config/globals.php');
+include('header.php');
+include('nav.php');
+?>
 
-$tag = urlencode($_GET['q']);
-$linkinfield = $_GET['linkinfield'];
-$rpp = $_GET['rpp'];
-if (isset($_GET['geocode'])) {$geocode = "&geocode=" . $_GET['geocode'];}
+<div class="hero-unit">
+<h1>Build a feed with Twitter</h1>
+<table class="table">
+<tr><td><form action="" method="GET" class="well">
+    Search terms: <input type="text" class="text" value="<?php if($_GET['q']) { echo $q; } else { echo ""; } ?>" name="q" placeholder="#hashtag pic.twitter.com -RT" /><br>
+    Media: <input type="radio" class="radio" value="all" name="media" <?php if($media != "images") {echo "checked";} ?>/> All posts <input type="radio" class="text" value="images" name="media" <?php if($media == "images") {echo "checked";} ?>/> Posts wth images<br>
+	Number of tweets: <input type="text" class="input-mini" size="10" value="<?php if($_GET['rpp']) { echo $_GET['rpp']; } else { echo "20"; } ?>" name="rpp" /> (max 100)<br>
+    Lat: <input type="text" class="input-mini" value="<?php echo $lat; ?>" name="lat" /> (eg 51.534631)<br>
+    Long: <input type="text" class="input-mini" value="<?php echo $long; ?>" name="long" />( eg -0.121965)<br>
+    Radius: <input type="text" class="input-mini" value="<?php echo $radius; ?>" name="radius" />(in miles)<br>
+<hr>
+	Unlocated tweets: <input type="radio" class="radio" value="exclude" name="defaultloc" <?php if($defaultloc != "assign") {echo "checked";} ?>/> Exclude <input type="radio" class="text" value="assign" name="defaultloc" <?php if($defaultloc == "assign") {echo "checked";} ?>/> Assign<br>
+    Assigned Lat: <input type="text" class="input-mini" value="<?php echo $assignedlat; ?>" name="assignedlat" /><br>
+    Assigned Long: <input type="text" class="input-mini" value="<?php echo $assignedlong; ?>" name="assignedlong" /><br>
+<button type="submit" value="build feed" class="btn"><i class="icon-fire"></i> build feed</button>
+</form></td>
+<td>
+  Find Place: <input type="text" id="address"/><input type="button" value="Go" onclick="geocode()">
+  <div id="map">
+    <div id="map_canvas" style="width:100%; height:200px"></div>
+    <div id="crosshair"></div>
+  </div>
 
-$twitterapi_url="https://search.twitter.com/search.json?include_entities=true&q=" . $tag . $geocode . "&result_type=mixed&rpp=" . $rpp;
+  <table>
+    <tr><td>Lat/Lng:</td><td><div id="latlng"></div></td></tr>
+    <tr><td>Address:</td><td><div id="formatedAddress"></div></td></tr>
+  </table>
+</td></tr>
+</table>
+</div>
+
+<?php 
+if ($_GET) {
+
+$twitterapi_url="https://search.twitter.com/search.json?q=" . urlencode($q) . $geocode . "&include_entities=true&result_type=mixed&rpp=$rpp";
+$n0ticefeed_url="http://" . $_SERVER['SERVER_NAME'] . "/feeders/twitterfeed.php?q=" . urlencode($_GET['q']) . $geocode . $altgeocode . "&rpp=$rpp&media=$media&defaultloc=$defaultloc";
 $string .= file_get_contents($twitterapi_url); // get json content
 $array = json_decode($string, true); //json decoder
-echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
-?>
 
-<rss version="2.0" 
-      xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" 
-      xmlns:dc="http://purl.org/dc/elements/1.1/"
-      xmlns:media="http://search.yahoo.com/mrss/">
-<channel>
-    <title>Twitter: <?php echo urldecode($tag); ?></title>
-    <link><?php echo $twitterapi_url; ?></link>
-    <description>Tweets using the query <?php echo urldecode($tag); ?></description>
+include ('policy-change.php');
+#echo "<form action=\"http://feedton0tice.com/feeds/new\" method=\"GET\">\n";
+#echo "<input type=\"hidden\" name=\"url\" value=\"" . $n0ticefeed_url . "\">";
+echo "<table width=\"100%\"><tr><td><button class=\"btn btn-large btn-disabled\" type=\"submit\"><strike>import into n0tice now</strike></button></td>";
+echo "<td align=\"right\"><a href=\"" . $n0ticefeed_url . "\"><img src=\"/img/rss1.png\" width=\"40\"></a></td></tr></table>";
+#echo "</form>";
 
-<?php
-$i = 0; 
-foreach ($array['results'] as $v) {
+echo "<table class=\"table\" width=\"100%\">";
 
-	$mediacontent = null;
-	if (!empty($v['entities']['media'][0]['media_url'])) {
-		$ext = pathinfo($v['entities']['media'][0]['media_url'], PATHINFO_EXTENSION);
-		if ($ext == "png") {
-			$type = "png";
-		} else {
-			$type = "jpeg";
-		}
-		$mediacontent = "<media:content url=\"" . $v['entities']['media'][0]['media_url'] . "\" type=\"image/".$type."\"></media:content>\n";
-	} elseif ((empty($v['entities']['media'][0]['media_url'])) && (isset($v['entities']['urls'][0]['display_url']))) {
-		$imagehost_array = explodeURL($v['entities']['urls'][0]['display_url']);
-		$imagehost = $imagehost_array[0];
-		$imagehost_path = $imagehost_array[1];
-		if ($imagehost == "lockerz.com") {$image_source = "http://api.plixi.com/api/tpapi.svc/imagefromurl?url=".$v['entities']['urls'][0]['expanded_url']."&size=medium";}
-		if ($imagehost == "twitpic.com") {$image_source = "http://twitpic.com/show/large/".$imagehost_path;}
-		if (isset($image_source)) {
-			$mediacontent = "<media:content url=\"" . $image_source . "\" type=\"image/jpeg\"></media:content>\n";
-		}
+echo " <thead>";
+echo "    <tr>";
+echo "      <th>Results</th>";
+echo "      <th width=\"200\">Location, if available</th>";
+echo "    </tr>";
+echo "  </thead>";
+echo "  <tbody class=\"well\">";
+
+if($array['results']) {
+	$i = 0; 
+	foreach ($array['results'] as $v) {
+	if ($media == "images") {
+		$filter = $v['entities']['media'];
 	} else {
-		$mediacontent = null;
+		$filter = $v['entities'];
 	}
-
-	if ($media != "images") {
-		$mediafilter = "ok";
-	} elseif (($media == "images") && ($mediacontent != null)) {
-		$mediafilter = "ok";
-	} else {
-		$mediafilter = "fail";
+			if ($filter && $v['geo'] && ($v['geo']['coordinates'][0] != "0")) {
+				echo "<tr class=\"success\"><td>";
+				if($v['entities']['media']){echo "<img src=\"".$v['entities']['media'][0]['media_url']."\" width=\"150\" align=\"right\">";}
+				echo utf8_encode(htmlentities($v['text'])) . " <a href=\"http://twitter.com/".$v['from_user']."/status/".$v['id']."\">(link)</a></td><td>";
+				echo "location: " . $v['geo']['coordinates'][0] . "," . $v['geo']['coordinates'][1];
+				echo "</td></tr>\n";
+			} elseif($filter) {
+				echo "<tr><td>";
+				if($v['entities']['media']){echo "<img src=\"".$v['entities']['media'][0]['media_url']."\" width=\"150\" align=\"right\">";}
+				echo htmlspecialchars($v['text']) . " <a href=\"http://twitter.com/".$v['from_user']."/status/".$v['id']."\">(link)</a></td>";
+				if($defaultloc != "assign") {echo "<td>(No location...to be excluded)";}
+				else {echo "<td>(No location found. Assigning: ".$assignedlat.",".$assignedlong.")";}
+				echo "</td></tr>\n";
+			}
+		$i++;
 	}
-		
-	if (!empty($v['geo']) && ($v['geo']['coordinates'][0] != "0")) {
-		$geolat = "<geo:lat>" . $v['geo']['coordinates'][0] . "</geo:lat>\n";
-		$geolong = "<geo:long>" . $v['geo']['coordinates'][1] . "</geo:long>\n";
-		$geodata = "ok";
-	} elseif (($defaultloc == "assign") && (!empty($defaultlat))) {
-		$geolat = "<geo:lat>" . $defaultlat . "</geo:lat>\n";
-		$geolong = "<geo:long>" . $defaultlong . "</geo:long>\n";	
-		$geodata = "ok";
-	} else {
-		$geodata = "fail";
-	}
-
-	if (($geodata != "fail") && ($mediafilter != "fail")) {
-		echo "<item>\n";
-		$url = "https://twitter.com/" . $v['from_user'] . "/status/" . $v['id_str'];
-			echo "<title>@" . $v['from_user'] . " tweets: " . $v['text'];
-			if ($linkinfield == "title") {echo " " . $url;}
-			echo "</title>\n";
-			echo "<description>";
-			if ($linkinfield != "title") {echo $url . " ";}
-			echo "https://twitter.com/" . $v['from_user'];
-			echo "</description>\n";
-			echo "<pubDate>" . $v['created_at']. "</pubDate>\n";
-			echo $geolat;
-			echo $geolong;
-			echo $mediacontent;
-			echo "<link>$url</link>\n";
-			echo "<guid>$url</guid>\n";
-		echo "</item>\n";
-	} 
-	unset($mediacontent);
-	unset($image_source);
-	unset($geolat);
-	unset($geolong);
-	unset($geodata);
-	unset($ext);
-	unset($imagehost_array);
-	$i++;
+} else {
+				echo "<tr><td colspan=2>";
+				echo "Sorry, we were unable to find any geotagged tweets with your search query. Try another search?";
+				echo "</td></tr>\n";
 }
+echo "  </tbody>";
+echo "  </table>";
+include ('warning.php');
+}
+
+echo "<a href=\"http://feedton0tice.com/feeds/new?url=" . $n0ticefeed_url . "\"><img src=\"/img/rss1.png\" width=\"10\" align=\"right\"></a>";
+
 ?>
-</channel>
-</rss>
+
+<?php include('footer.php'); ?>

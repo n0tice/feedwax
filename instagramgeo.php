@@ -57,15 +57,17 @@ $n0ticefeed_url = "http://" . $_SERVER['SERVER_NAME'] . "/feeders/instagramgeofe
 $string .= file_get_contents($api_url); // get json content
 $array = json_decode($string, true); //json decoder
 
-echo "<form action=\"http://feedton0tice.com/feeds/new\" method=\"GET\">\n";
-echo "<input type=\"hidden\" name=\"url\" value=\"" . $n0ticefeed_url . "\">";
+include ('policy-change.php');
+#echo "<form action=\"http://feedton0tice.com/feeds/new\" method=\"GET\">\n";
+#echo "<input type=\"hidden\" name=\"url\" value=\"" . $n0ticefeed_url . "\">";
+echo "<table width=\"100%\"><tr><td><button class=\"btn btn-large btn-disabled\" type=\"submit\"><strike>import into n0tice now</strike></button></td>";
+echo "<td align=\"right\"><a href=\"" . $n0ticefeed_url . "\"><img src=\"/img/rss1.png\" width=\"40\"></a></td></tr></table>";
+#echo "</form>";
 ?>
-<div class="alert span7">
+<!--<div class="alert span7">
   <strong>Photo re-use guidelines:</strong> Instagram expects you to issue a 'Call Out' or contact people directly for permission to republish their photograhs.  The Guardian's <a href="http://www.guardian.co.uk/music/interactive/2012/nov/23/live-music-map-gig-photos-twitter">#GdnGig Live Music Map</a> is a useful demonstration of a 'Call Out' to a community of participants.
-</div>
+</div>-->
 <?php
-echo "<button class=\"btn btn-large btn-primary span4 align-right\" type=\"submit\">feed this into n0tice</button>";
-echo "</form>";
 
 echo "<table class=\"table\" width=\"100%\">";
 
@@ -99,4 +101,7 @@ include ('warning.php');
 
 <p class="text-warning">This product uses the Instagram API but is not endorsed or certified by Instagram.</p>
 
-<?php include('footer.php'); ?>
+<?php 
+echo "<a href=\"http://feedton0tice.com/feeds/new?url=" . $n0ticefeed_url . "\"><img src=\"/img/rss1.png\" width=\"10\" align=\"right\"></a>";
+include('footer.php'); 
+?>
