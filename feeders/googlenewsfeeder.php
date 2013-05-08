@@ -1,9 +1,9 @@
 <?php
-include('../config/globals.php');
 header('Content-type: application/rss+xml; charset=utf-8');
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Cache-Control: no-cache");
 header("Pragma: no-cache");
+include('../config/globals.php');
 
 echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
 if ($_GET['type'] == "news") {
@@ -46,15 +46,13 @@ foreach ($xml->channel->item as $v) {
 		if ($geo->lat) {
 			echo "<item>\n";
 			$title = strip_tags($v->title);
-			$title = html_entity_decode($title, ENT_COMPAT, 'UTF-8');
-			echo "     <title>" . str_replace ( '&', '&amp;', $title );
+			$cleantitle = html_entity_decode($title, ENT_COMPAT, 'UTF-8');
+			$description = strip_tags($v->description);
+			$cleandescription = html_entity_decode($description, ENT_COMPAT, 'UTF-8');
+			echo "     <title>" . str_replace ( '&', '&amp;', $cleantitle );
 			if ($dc->creator) {echo " - " . $dc->creator;}
 			echo " " . $hashtag . " " . $link . "</title>\n";
-			if ($_GET['source'] == "googlenews" && $_GET['type'] == "news") {
-				echo "     <description><![CDATA[" . $v->description . "<br><br>".htmlentities($v->link)."]]></description>\n";
-			} else {
-				echo "     <description><![CDATA[" . htmlspecialchars($v->description) . "<br><br>".htmlentities($v->link)."]]></description>\n";
-			}
+			echo "     <description>" . $cleandescription . "</description>\n";
 			if ($v->copyright) {echo "     <copyright>" . $v->copyright . "</copyright>\n";}
 			echo "     <link>" . $link . "</link>\n";
 			echo "     <guid>" . htmlentities($v->link) . "</guid>\n";
