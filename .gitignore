@@ -22,3 +22,11 @@ custom/.DS_Store
 .DS_Store
 
 feeders/twitterfeed-temp.php
+
+twitter-current.php
+
+twitter-new.php
+
+twitter-nofilter.php
+
+twitter-old.php
