@@ -1,6 +1,6 @@
 <?php
 include('../config/globals.php');
-header('Content-type: application/rss+xml; charset=utf-8');
+header('Content-type: text/xml');
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Cache-Control: no-cache");
 header("Pragma: no-cache");
@@ -31,7 +31,6 @@ function explodeCommas($commalist) {
 }
 list($defaultlat,$defaultlong) = explodeCommas($defaultloc);
 
-echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n\n";
 $instagram_cleantag1="https://api.instagram.com/v1/tags/".urlencode($cleantag1)."/media/recent?client_id=$client_id&count=$count";
 $string_cleantag1 .= file_get_contents($instagram_cleantag1); // get json content
 $array_cleantag1 = json_decode($string_cleantag1, true); //json decoder
@@ -67,16 +66,17 @@ if (!empty($cleantag2)) {
 	}
 }
 
+echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
 ?>
-
 <rss version="2.0" 
       xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" 
       xmlns:dc="http://purl.org/dc/elements/1.1/"
       xmlns:media="http://search.yahoo.com/mrss/">
 <channel>
-    <title>Instagrams: <?php echo $tag; ?></title>
-    <link>http://feedwax.com/instagramtag.php?<?php echo urlencode($_SERVER['QUERY_STRING']); ?></link>
+    <title>Instagrams of <?php echo $tag; ?></title>
+    <link>http://feedwax.com/</link>
     <description>Instagram feed of photos tagged with "<?php echo $tag; ?>"</description>
+<atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="self" type="application/rss+xml" href="http://feedwax.com/feeders/instagramfeed.php?q=<?php echo $tag; ?>"/>
 
 <?php
 $i = 0; 
