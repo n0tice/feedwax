@@ -75,7 +75,7 @@ if (!empty($cleantag2)) {
       xmlns:media="http://search.yahoo.com/mrss/">
 <channel>
     <title>Instagrams: <?php echo $tag; ?></title>
-    <link>http://feedwax.com/instagramtag.php?<?php echo $_SERVER['QUERY_STRING']; ?></link>
+    <link>http://feedwax.com/instagramtag.php?<?php echo urlencode($_SERVER['QUERY_STRING']); ?></link>
     <description>Instagram feed of photos tagged with "<?php echo $tag; ?>"</description>
 
 <?php

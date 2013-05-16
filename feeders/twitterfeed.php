@@ -45,7 +45,7 @@ echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
       xmlns:media="http://search.yahoo.com/mrss/">
 <channel>
     <title>Twitter: <?php echo urldecode($tag); ?></title>
-    <link><?php echo $twitterapi_url; ?></link>
+    <link><?php echo "https://search.twitter.com/search.json?include_entities=true&amp;q=" . urlencode($tag) . $geocode . "&amp;result_type=mixed&amp;rpp=" . $rpp; ?></link>
     <description>Tweets using the query <?php echo urldecode($tag); ?></description>
 
 <?php
