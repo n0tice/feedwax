@@ -102,8 +102,8 @@ $array = json_decode($string, true); //json decoder
 include ('policy-change.php');
 #echo "<form action=\"http://feedton0tice.com/feeds/new\" method=\"GET\">\n";
 #echo "<input type=\"hidden\" name=\"url\" value=\"" . $n0ticefeed_url . "\">";
-echo "<table width=\"100%\"><tr><td><button class=\"btn btn-large btn-disabled\" type=\"submit\"><strike>import into n0tice now</strike></button></td>";
-echo "<td align=\"right\"><a href=\"" . $n0ticefeed_url . "\"><img src=\"/img/rss1.png\" width=\"40\"></a></td></tr></table>";
+#echo "<table width=\"100%\"><tr><td><button class=\"btn btn-large btn-disabled\" type=\"submit\"><strike>import into n0tice now</strike></button></td>";
+#echo "<td align=\"right\"><a href=\"" . $n0ticefeed_url . "\"><img src=\"/img/rss1.png\" width=\"40\"></a></td></tr></table>";
 #echo "</form>";
 
 echo "<table class=\"table\" width=\"100%\">";
