@@ -1,0 +1,11 @@
+Package: feedwax
+Version: %VERSION%
+Depends: apache2, libapache2-mod-php5, php5-common, php-apc, php5-curl
+Section: feedwax
+Priority: optional
+Architecture: all
+Essential: no
+Installed-Size: 1024
+Maintainer: Tony McCrae [tony@eelpieconsulting.co.uk]
+Provides: feedwax
+Description: Feedwax application.

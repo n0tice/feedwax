@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="feedwax" default="zip">
+	
+    <property file="build.properties" />
+
+    <target name="clean">
+        <delete includeemptydirs="true">
+            <fileset dir="target" includes="**/*"/>
+        </delete>
+    </target>
+	
+    <target name="zip">
+        <mkdir dir="target"/>
+        <echo message="Building zip file of application, htdocs and library files" />
+        <zip destfile="target/feedwax.zip" >
+            <zipfileset dir=".">
+                <include name="htdocs/**" />
+            </zipfileset>
+        </zip>
+    </target>
+	
+    <target name="package" depends="clean, zip">
+        <echo message="Packaging as version: ${version}" />
+		
+        <mkdir dir="target/package/feedwax"/>
+        <copy todir="target/package/feedwax/DEBIAN">
+            <fileset dir="packages/feedwax/DEBIAN"/>
+            <filterset  begintoken="%" endtoken="%">
+                <filter token="VERSION" value="${version}"/>
+            </filterset>
+        </copy>
+        <chmod file="target/package/feedwax/DEBIAN/postinst" perm="755"/>
+
+        <mkdir dir="target/package/feedwax/${package.install.dir}/" />
+		
+        <echo message="Unzipping files into package" />
+        <unzip src="target/feedwax.zip" dest="target/package/feedwax/${package.install.dir}"/>
+	
+	<copy todir="target/package/feedwax/etc/apache2/sites-available">
+	     <fileset dir="apache"/>	
+	</copy>
+
+        <exec executable="dpkg" dir="target/package">
+            <arg value="-b"/>
+            <arg value="feedwax"/>
+        </exec>
+
+        <move file="target/package/feedwax.deb" tofile="target/feedwax_${version}.deb" />
+    </target>
+
+</project>

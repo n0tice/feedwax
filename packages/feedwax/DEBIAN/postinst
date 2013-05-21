@@ -1,0 +1,9 @@
+#!/bin/sh
+echo 'Making session folder writable by www-data'
+chown -R www-data:www-data /home/feedwax
+
+if [ ! -e /etc/apache2/sites-enabled/feedwax.com ]
+then
+        ln -s /etc/apache2/sites-available/feedwax.com /etc/apache2/sites-enabled/feedwax.com
+fi
+
