@@ -44,7 +44,7 @@ echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
       xmlns:dc="http://purl.org/dc/elements/1.1/"
       xmlns:media="http://search.yahoo.com/mrss/">
 <channel>
-    <title>Twitter: <?php echo urldecode($tag); ?></title>
+    <title>Tweets tagged with <?php echo urldecode($tag); ?></title>
     <link><?php echo "https://search.twitter.com/search.json?include_entities=true&amp;q=" . urlencode($tag) . $geocode . "&amp;result_type=mixed&amp;rpp=" . $rpp; ?></link>
     <description>Tweets using the query <?php echo urldecode($tag); ?></description>
 	<atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="self" type="application/rss+xml" href="http://feedwax.com/feeders/twitterfeed.php?q=<?php echo $tag; ?>"/>
